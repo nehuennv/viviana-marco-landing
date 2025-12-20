@@ -1,0 +1,56 @@
+/* 1. IMPORTAMOS SOLO POPPINS (Todos los pesos necesarios) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* DEFINIMOS LAS ANIMACIONES (Aurora / Ghost / La que elijas) */
+@keyframes ghost-drift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+body {
+  /* 2. REGLA DE ORO: La fuente base es POPPINS */
+  font-family: 'Poppins', sans-serif;
+  
+  /* Color de texto base */
+  @apply text-slate-800 antialiased;
+
+  /* --- FONDO HÍBRIDO (El que hicimos antes) --- */
+  background-color: #ffffff; /* Base para PC */
+}
+
+/* MEDIA QUERY: ANIMACIÓN EN CELULARES */
+@media (max-width: 1024px) {
+  body {
+    background-image: radial-gradient(
+      circle, 
+      rgba(162, 0, 255, 0.05) 0%, 
+      transparent 60%
+    );
+    background-size: 200% 200%;
+    animation: ghost-drift 10s ease-in-out infinite;
+    background-attachment: fixed;
+  }
+}
+
+/* 3. REFORZAMOS QUE TODO USE LA MISMA FUENTE */
+h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, select, textarea {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.01em; /* Un pelín más junto para que se vea más moderno */
+}
+
+/* Estilo de Botones */
+.btn {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Scrollbar invisible */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
