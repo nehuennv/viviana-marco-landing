@@ -25,28 +25,29 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* HEADER */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
-          <div className="max-w-2xl">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-10 mb-16">
+          
+          <div className="max-w-2xl text-center md:text-left">
+            {/* COPYWRITING CORREGIDO: Neutro y con Autoridad */}
             <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6 leading-tight">
-              ¿Lista para tu <br/>
+              Tu nueva imagen <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
-                nueva sonrisa?
+                comienza hoy.
               </span>
             </h2>
-            <p className="text-slate-300 text-lg max-w-md">
-              Agendá tu consulta hoy y descubrí la mejor versión de tu estética facial y dental.
+            <p className="text-slate-300 text-[15px] md:text-lg max-w-md mx-auto md:mx-0 leading-7">
+              Un enfoque médico y estético diseñado exclusivamente para vos.
             </p>
           </div>
 
-          {/* BOTÓN "LIGHT": LEVITACIÓN SUAVE (Sin giros mareadores) */}
+          {/* BOTÓN "LIGHT" */}
           <motion.button 
             onClick={scrollToTop}
-            whileHover={{ scale: 1.05, y: -5 }} // Se agranda un pelín y sube (Levita)
-            whileTap={{ scale: 0.95 }} // Al clickear se achica (Feedback táctil)
+            whileHover={{ scale: 1.05, y: -5 }} 
+            whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className="group w-24 h-24 rounded-full bg-white text-indigo-950 flex flex-col items-center justify-center gap-1 font-bold text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-colors duration-300 shadow-2xl shadow-white/10"
+            className="group w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-full bg-white text-indigo-950 flex flex-col items-center justify-center gap-1 font-bold text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-colors duration-300 shadow-2xl shadow-white/10"
           >
-            {/* La flecha sube independientemente para dar dirección */}
             <ArrowUp size={24} className="group-hover:-translate-y-1 transition-transform duration-300" />
             Subir
           </motion.button>
@@ -71,11 +72,11 @@ const Footer = () => {
             <div>
               <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">Contacto</h4>
               <div className="space-y-4">
-                <a href="mailto:Mdravivianamarco@gmail.com" className="flex items-center gap-3 text-lg hover:text-primary transition-colors">
-                  <Mail size={18} className="text-slate-400" /> Mdravivianamarco@gmail.com
+                <a href="mailto:Mdravivianamarco@gmail.com" className="flex items-center gap-3 text-sm md:text-lg hover:text-primary transition-colors break-all">
+                  <Mail size={18} className="text-slate-400 flex-shrink-0" /> Mdravivianamarco@gmail.com
                 </a>
                 <a href="https://wa.me/5492995977208" target="_blank" className="flex items-center gap-3 text-lg hover:text-primary transition-colors">
-                  <Phone size={18} className="text-slate-400" /> +54 9 299 597-7208
+                  <Phone size={18} className="text-slate-400 flex-shrink-0" /> +54 9 299 597-7208
                 </a>
               </div>
             </div>
@@ -87,7 +88,7 @@ const Footer = () => {
           </div>
 
           {/* CARD MAPA */}
-          <div className="md:col-span-5 bg-slate-800/50 border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+          <div className="md:col-span-5 bg-slate-800/50 border border-white/10 rounded-3xl p-8 relative overflow-hidden group min-h-[250px]">
             <svg className="absolute inset-0 w-full h-full opacity-20 group-hover:opacity-30 transition-opacity duration-500 scale-125" viewBox="0 0 100 100">
                <path d="M0 0 L100 100 M100 0 L0 100 M50 0 L50 100 M0 50 L100 50" stroke="currentColor" strokeWidth="0.5" className="text-white" />
             </svg>
@@ -99,7 +100,7 @@ const Footer = () => {
               </div>
               <h3 className="text-2xl font-bold mb-1">Neuquén Capital</h3>
               <p className="text-slate-300 mb-4">Fotheringham 115</p>
-              <a href="https://maps.google.com" target="_blank" className="btn btn-sm bg-white/10 border-none text-white hover:bg-white hover:text-indigo-950 rounded-full px-6 backdrop-blur-md">
+              <a href="https://www.google.com/maps/place/Dra+Viviana+Marco/@-38.9537869,-68.07154,17z/data=!3m1!4b1!4m6!3m5!1s0x960a33f5b82c7a9b:0x6dc30e7823932ffa!8m2!3d-38.9537911!4d-68.0689651!16s%2Fg%2F11mlhfkh1f?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" className="btn btn-sm bg-white/10 border-none text-white hover:bg-white hover:text-indigo-950 rounded-full px-6 backdrop-blur-md">
                 Abrir Mapa
               </a>
             </div>
@@ -107,13 +108,12 @@ const Footer = () => {
 
         </div>
 
-        {/* COPYRIGHT BAR */}
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium uppercase tracking-widest">
+        {/* COPYRIGHT BAR (LIMPIO: Sin términos y privacidad) */}
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium uppercase tracking-widest text-center md:text-left">
           <p>© {new Date().getFullYear()} Dra. Viviana Marco.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacidad</a>
-            <a href="#" className="hover:text-white transition-colors">Términos</a>
-          </div>
+          
+          {/* ELIMINADO EL DIV DE LINKS DE PRIVACIDAD */}
+          
           <p>
             Designed by{' '}
             <a 

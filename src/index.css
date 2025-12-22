@@ -1,56 +1,85 @@
-/* 1. IMPORTAMOS SOLO POPPINS (Todos los pesos necesarios) */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* DEFINIMOS LAS ANIMACIONES (Aurora / Ghost / La que elijas) */
-@keyframes ghost-drift {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
-}
-
-body {
-  /* 2. REGLA DE ORO: La fuente base es POPPINS */
-  font-family: 'Poppins', sans-serif;
+@layer base {
+  /* --- 1. GLOBAL SETTINGS --- */
   
-  /* Color de texto base */
-  @apply text-slate-800 antialiased;
+  /* --- AGREGAR ESTE BLOQUE AQUÍ --- */
+  html {
+    font-size: 15px; /* En móvil: achica todo sutilmente */
+    scroll-behavior: smooth;
+  }
 
-  /* --- FONDO HÍBRIDO (El que hicimos antes) --- */
-  background-color: #ffffff; /* Base para PC */
-}
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px; /* En PC: vuelve al tamaño estándar original */
+    }
+  }
+  /* -------------------------------- */
 
-/* MEDIA QUERY: ANIMACIÓN EN CELULARES */
-@media (max-width: 1024px) {
   body {
-    background-image: radial-gradient(
-      circle, 
-      rgba(162, 0, 255, 0.05) 0%, 
-      transparent 60%
-    );
-    background-size: 200% 200%;
-    animation: ghost-drift 10s ease-in-out infinite;
-    background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
+    @apply text-slate-800 antialiased bg-white; /* Mantenemos TUS estilos */
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* --- 2. PREMIUM SCROLLBAR (MANTENEMOS TU CÓDIGO INTACTO ABAJO) --- */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c084fc transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #c084fc;
+    border-radius: 9999px;
+    border: 4px solid transparent;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #a855f7;
+  }
+
+  /* --- 3. CLEAN INTERACTIONS --- */
+  button, a, input, select, textarea {
+    @apply outline-none focus:outline-none;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* 3. REFORZAMOS QUE TODO USE LA MISMA FUENTE */
-h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, select, textarea {
-  font-family: 'Poppins', sans-serif;
-  letter-spacing: -0.01em; /* Un pelín más junto para que se vea más moderno */
+@layer utilities {
+  /* --- 4. UTILITIES --- */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-/* Estilo de Botones */
-.btn {
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-
-/* Scrollbar invisible */
-::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+/* --- 5. BROWSER FIXES --- */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-text-fill-color: #334155 !important;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0) !important;
 }
