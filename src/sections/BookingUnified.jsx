@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { InlineWidget } from 'react-calendly';
+// ELIMINADO: import { InlineWidget } from 'react-calendly';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MessageCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Calendar, MessageCircle, ArrowRight, Sparkles, ShieldCheck } from 'lucide-react';
 
 // --- COMPONENTE INTERNO: SWITCH ---
 const LiquidSwitch = ({ activeTab, setActiveTab }) => {
@@ -76,7 +76,7 @@ const BookingUnified = ({ initialTreatment }) => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1 // Cada hijo tarda 0.1s más en aparecer
+        staggerChildren: 0.1
       }
     }
   };
@@ -126,36 +126,29 @@ const BookingUnified = ({ initialTreatment }) => {
               >
                 <div className="relative bg-white/60 backdrop-blur-2xl border border-slate-200 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-violet-900/5 transition-all duration-500">
 
-                  {/* HEADER DEL FORMULARIO CON ICONO MEJORADO */}
+                  {/* HEADER DEL FORMULARIO */}
                   <div className="flex items-center gap-5 mb-8">
                     <div className="relative group">
-                      
-                      {/* Efecto de Pulso/Onda detrás */}
                       <div className="absolute inset-0 bg-violet-400 rounded-2xl blur-md opacity-20 animate-pulse group-hover:opacity-40 transition-opacity duration-500"></div>
-                      
-                      {/* Contenedor del Ícono: Fondo más sólido (violet-100) para contraste */}
                       <div className="relative w-16 h-16 bg-violet-100/80 rounded-2xl flex items-center justify-center text-violet-600 border border-violet-200 shadow-inner group-hover:scale-105 transition-transform duration-300">
-                         <MessageCircle size={28} strokeWidth={2.5} className="drop-shadow-sm" />
+                        <MessageCircle size={28} strokeWidth={2.5} className="drop-shadow-sm" />
                       </div>
-
-                      {/* Notificación (Puntito) */}
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 border-[3px] border-white rounded-full shadow-sm z-10"></div>
                     </div>
-                    
                     <div>
                       <h3 className="text-xl font-bold text-slate-800 leading-tight">Asistente Virtual</h3>
                       <p className="text-slate-500 text-sm font-medium flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         En línea ahora
                       </p>
                     </div>
                   </div>
 
-                  {/* FORMULARIO CON STAGGER ANIMATION */}
-                  <motion.form 
+                  <motion.form
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    onSubmit={handleSubmit} 
+                    onSubmit={handleSubmit}
                     className="space-y-6"
                   >
                     <motion.div variants={itemVariants} className="space-y-2">
@@ -215,7 +208,7 @@ const BookingUnified = ({ initialTreatment }) => {
               </motion.div>
             )}
 
-            {/* OPCIÓN B: CALENDARIO */}
+            {/* OPCIÓN B: CALENDARIO (CALU) */}
             {bookingMode === 'calendar' && (
               <motion.div
                 key="calendar"
@@ -223,11 +216,25 @@ const BookingUnified = ({ initialTreatment }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}
-                className="w-full bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100"
+                className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl shadow-violet-900/5 overflow-hidden border border-slate-200 relative h-[750px] flex flex-col"
               >
-                <InlineWidget
-                  url="https://calendly.com/TU-USUARIO"
-                  styles={{ height: '700px', width: '100%' }}
+                {/* 1. BARRA DE AVISO SUPERIOR */}
+                <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-100 px-4 py-3 md:py-4 flex items-center justify-center gap-2 text-xs text-slate-500 font-medium text-center">
+                  <ShieldCheck size={14} className="text-violet-500 flex-shrink-0" />
+                  <span>Plataforma Médica Segura: Inicia sesión o regístrate para acceder a la agenda.</span>
+                </div>
+
+                {/* 2. LOADER */}
+                <div className="absolute inset-0 top-10 flex items-center justify-center bg-white -z-10">
+                  <div className="w-8 h-8 border-4 border-violet-100 border-t-violet-500 rounded-full animate-spin"></div>
+                </div>
+
+                {/* 3. IFRAME OFICIAL */}
+                <iframe
+                  src="https://citas.calu.app/coiconsultorio"
+                  title="Agenda de Turnos Dra. Viviana Marco"
+                  className="w-full h-full border-none flex-grow bg-white"
+                  loading="lazy"
                 />
               </motion.div>
             )}
