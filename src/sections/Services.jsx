@@ -1,19 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react'; // Agregamos useEffect
+import React, { useState, useRef } from 'react';
 import { Smile, Sparkles, Syringe, Moon, Zap, User, ArrowUpRight, Sparkle, Activity, ScanFace } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ServiceModal from '../components/ServiceModal';
 
-// --- IMPORTACIÓN DE IMÁGENES ---
-import imgBotox from '../assets/tratamientos/botox-full-face.webp';
-import imgHialuronico from '../assets/tratamientos/hialuronico.webp';
-import imgMeso from '../assets/tratamientos/mesoterapia.webp';
-import imgBio from '../assets/tratamientos/bioestimulacion.webp';
-import imgBruxismo from '../assets/tratamientos/bruxismo.webp';
-import imgAlineadores from '../assets/tratamientos/alineadores.webp';
-import imgBrackets from '../assets/tratamientos/brackets-damon.webp';
-import imgPlaca from '../assets/tratamientos/placa.webp';
-
-// --- DATA ---
+// --- DATA OPTIMIZADA (WebP + width=600) ---
 const facialAesthetics = [
   {
     id: 'f1',
@@ -22,7 +12,7 @@ const facialAesthetics = [
     desc: "Relaja músculos del tercio superior para suavizar expresiones.",
     longDesc: "El tratamiento ideal para suavizar la expresión. Aplicamos toxina botulínica en tercio superior para relajar la musculatura, eliminando arrugas de frente, entrecejo y patas de gallo sin perder naturalidad.",
     steps: ["Evaluación mímica", "Diseño de puntos", "Aplicación (10 min)", "Control 15 días"],
-    image: imgBotox,
+    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <Syringe size={24} />,
   },
   {
@@ -32,7 +22,7 @@ const facialAesthetics = [
     desc: "Perfilado e hidratación labial con ácido hialurónico premium.",
     longDesc: "Utilizamos ácido hialurónico para perfilar, hidratar y dar volumen sutil a los labios. También realizamos rinomodelación y relleno de pómulos/mentón para armonizar el perfil.",
     steps: ["Anestesia tópica", "Diseño anatómico", "Aplicación", "Resultados inmediatos"],
-    image: imgHialuronico,
+    image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <User size={24} />,
   },
   {
@@ -42,7 +32,7 @@ const facialAesthetics = [
     desc: "Cóctel nutritivo NCTF para revitalizar y dar luminosidad.",
     longDesc: "Microinyecciones de un complejo nutritivo que revitaliza la piel apagada, mejora poros dilatados y aporta una luminosidad inigualable ('Glow Effect').",
     steps: ["Limpieza profunda", "Aplicación Meso", "Máscara descongestiva", "Piel radiante"],
-    image: imgMeso,
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <Sparkles size={24} />,
   },
   {
@@ -52,7 +42,7 @@ const facialAesthetics = [
     desc: "Generación de colágeno propio para combatir la flacidez.",
     longDesc: "Utilizamos bioestimuladores (Radiesse/Sculptra) que estimulan a tu cuerpo a producir colágeno. Tratamiento #1 para combatir la flacidez facial a largo plazo.",
     steps: ["Vectores de tensión", "Aplicación cánula", "Estimulación progresiva", "Pico efecto 3 meses"],
-    image: imgBio,
+    image: "https://images.unsplash.com/photo-1609188076864-c35269136b09?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <Activity size={24} />,
   },
   {
@@ -62,7 +52,7 @@ const facialAesthetics = [
     desc: "Relajación de maseteros para reducir mordida y afinar rostro.",
     longDesc: "Tratamiento médico-estético. Reducimos la fuerza de la mordida involuntaria, protegiendo tus dientes del desgaste y afinando visualmente el rostro.",
     steps: ["Palpación muscular", "Aplicación", "Alivio de tensión", "Protección dental"],
-    image: imgBruxismo,
+    image: "https://plus.unsplash.com/premium_photo-1661774916843-14975d04595e?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <ScanFace size={24} />,
   }
 ];
@@ -75,7 +65,7 @@ const orthodontics = [
     desc: "Ortodoncia sin brackets. Placas transparentes y removibles.",
     longDesc: "La opción premium. Placas transparentes que cambias cada semana. Nadie notará que los llevas puestos. Comé lo que quieras y cepillate sin obstáculos.",
     steps: ["Escaneo 3D", "Planificación digital", "Entrega de set", "Controles"],
-    image: imgAlineadores,
+    image: "https://images.unsplash.com/photo-1598256989626-60ed1543c21b?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <Smile size={24} />,
   },
   {
@@ -85,7 +75,7 @@ const orthodontics = [
     desc: "Sistema de baja fricción. Más rápidos y con menos molestias.",
     longDesc: "Tecnología de autoligado. No llevan 'gomitas', lo que permite que el diente se mueva más rápido y con menos dolor. Ideales para casos complejos.",
     steps: ["Cementado preciso", "Arcos termoactivos", "Menos visitas", "Sonrisa amplia"],
-    image: imgBrackets,
+    image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <Zap size={24} />,
   },
   {
@@ -95,7 +85,7 @@ const orthodontics = [
     desc: "Dispositivos de avance mandibular para mejorar el sueño.",
     longDesc: "Dispositivo que libera la vía aérea durante la noche. Es pequeño, cómodo y cambia la vida del paciente (y su pareja) al reducir ronquidos.",
     steps: ["Diagnóstico sueño", "Toma de registros", "Confección", "Descanso reparador"],
-    image: imgPlaca,
+    image: "https://plus.unsplash.com/premium_photo-1661777196224-bfda51e61cfd?q=80&w=600&auto=format&fit=crop&fm=webp",
     icon: <Moon size={24} />,
   }
 ];
@@ -110,7 +100,7 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="inline-flex bg-white/50 backdrop-blur-md p-1.5 rounded-full border border-slate-200 shadow-sm relative">
+    <div className="inline-flex bg-white/50 backdrop-blur-md p-1.5 rounded-full border border-slate-100/50 shadow-sm relative">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -125,7 +115,7 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
           >
             {isActive && (
               <motion.div
-                layoutId="active-pill-services" 
+                layoutId="active-pill-services"
                 className="absolute inset-0 bg-violet-600 rounded-full shadow-md z-10"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
@@ -142,13 +132,12 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
 
 // --- SERVICE CARD ---
 const ServiceCard = ({ service, onClick, isCenter }) => (
-  <motion.div 
+  <motion.div
     layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ 
+    animate={{
       opacity: 1,
-      // OPTIMIZACIÓN: Si es móvil, evitamos escalar para no confundir al usuario ni gastar GPU
-      scale: isCenter ? 1 : 0.95, 
+      scale: isCenter ? 1 : 0.9,
     }}
     exit={{ opacity: 0, scale: 0.95 }}
     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -164,7 +153,6 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
                  transition-colors duration-300 shadow-md md:shadow-sm active:scale-[0.98] transition-transform"
 
     >
-      {/* SHIMMER EFFECT - Optimizado: Solo visible en hover */}
       <div className="absolute inset-0 -translate-x-[150%] skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1s_ease-in-out]" />
 
       <div className="flex flex-col items-center mb-6 relative z-10">
@@ -209,50 +197,36 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
   </motion.div>
 );
 
-const Services = ({ onTreatmentSelect = () => {} }) => {
+const Services = ({ onTreatmentSelect = () => { } }) => {
   const [selectedService, setSelectedService] = useState(null);
-  const [activeTab, setActiveTab] = useState('facial'); 
+  const [activeTab, setActiveTab] = useState('facial');
 
   const scrollRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  
-  // 1. REF PARA THROTTLING (OPTIMIZACIÓN DE SCROLL)
-  const ticking = useRef(false);
 
   const displayServices = activeTab === 'facial' ? facialAesthetics : orthodontics;
 
-  // 2. FUNCIÓN DE SCROLL OPTIMIZADA CON rAF
   const handleScroll = () => {
-    if (!ticking.current) {
-      window.requestAnimationFrame(() => {
-        if (scrollRef.current) {
-          const container = scrollRef.current;
-          const scrollLeft = container.scrollLeft;
-          const containerCenter = scrollLeft + (container.offsetWidth / 2);
-          
-          let closestIndex = 0;
-          let closestDistance = Infinity;
-          
-          // Iteramos hijos directamente para evitar crear arrays gigantes en memoria
-          const children = container.children;
-          for (let i = 0; i < children.length; i++) {
-             // Evitamos leer hijos extraños (como espaciadores)
-             if (i >= displayServices.length) break;
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const scrollLeft = container.scrollLeft;
+      const containerCenter = scrollLeft + (container.offsetWidth / 2);
 
-             const child = children[i];
-             const cardCenter = child.offsetLeft + (child.offsetWidth / 2);
-             const distance = Math.abs(containerCenter - cardCenter);
-             
-             if (distance < closestDistance) {
-               closestDistance = distance;
-               closestIndex = i;
-             }
-          }
-          setActiveIndex(closestIndex);
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      Array.from(container.children).forEach((child, index) => {
+        if (index >= displayServices.length) return;
+        const cardCenter = child.offsetLeft + (child.offsetWidth / 2);
+        const distance = Math.abs(containerCenter - cardCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
         }
-        ticking.current = false;
       });
-      ticking.current = true;
+
+      setActiveIndex(closestIndex);
     }
   };
 
@@ -272,54 +246,53 @@ const Services = ({ onTreatmentSelect = () => {} }) => {
   };
 
   return (
-    <section id="services" className="relative py-12 md:py-24 overflow-hidden">
-      
-      {/* BACKGROUND BLUR ESTÁTICO (Optimizado para no moverse) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-[80px] pointer-events-none -z-10"></div>
+    <section id="services" className="relative py-12 md:py-32 overflow-hidden">
+
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
       <div className="max-w-7xl mx-auto px-0 md:px-6 relative z-10">
-        
+
         {/* --- HEADER --- */}
         <div className="text-center mb-12 px-6">
-          <motion.div 
-             initial={{ opacity: 0, scale: 0.9 }}
-             whileInView={{ opacity: 1, scale: 1 }}
-             viewport={{ once: true }}
-             className={badgeClass}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className={badgeClass}
           >
             <div className="bg-primary/10 p-1 rounded-full text-primary">
               <Sparkle size={12} fill="currentColor" />
             </div>
             <span>Nuestros Servicios</span>
           </motion.div>
-          
+
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
             Estética & <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-400">Salud Integral.</span>
           </h2>
-          
-          <p className="text-[15px] md:text-lg text-slate-500 font-light max-w-2xl mx-auto leading-7 md:leading-relaxed mb-10">
+
+          <p className="text-lg text-slate-500 font-light max-w-2xl mx-auto leading-relaxed mb-10">
             Descubrí la fusión perfecta entre tecnología digital y calidez humana.
           </p>
 
           <div className="flex justify-center">
-             <LiquidSwitch activeTab={activeTab} setActiveTab={setActiveTab} />
+            <LiquidSwitch activeTab={activeTab} setActiveTab={setActiveTab} />
           </div>
         </div>
 
         {/* --- CONTENIDO --- */}
         <div>
           <AnimatePresence mode="wait">
-             <motion.div 
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                
-                ref={scrollRef}
-                onScroll={handleScroll} 
-                
-                className="
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+
+              ref={scrollRef}
+              onScroll={handleScroll}
+
+              className="
                   flex 
                   md:flex-wrap md:justify-center 
                   gap-4 md:gap-6
@@ -327,29 +300,28 @@ const Services = ({ onTreatmentSelect = () => {} }) => {
                   pl-[calc((100vw-280px)/2)] pr-[calc((100vw-280px)/2)]
                   md:px-6 pb-8 md:pb-0 
                   hide-scrollbar
-                  scroll-smooth
                 "
-              >
-                {displayServices.map((service, idx) => (
-                   <ServiceCard 
-                     key={service.id} 
-                     service={service} 
-                     onClick={() => handleCardClick(service)}
-                     isCenter={idx === activeIndex}
-                   />
-                ))}
-                
-                <div className="w-1 md:hidden flex-shrink-0" />
-             </motion.div>
+            >
+              {displayServices.map((service, idx) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  onClick={() => handleCardClick(service)}
+                  isCenter={idx === activeIndex}
+                />
+              ))}
+
+              <div className="w-1 md:hidden flex-shrink-0" />
+            </motion.div>
           </AnimatePresence>
         </div>
 
         {/* --- DOTS INDICATORS --- */}
-        <div className="flex md:hidden justify-center gap-2 mt-1 ">
+        <div className="flex md:hidden justify-center gap-2 mt-1 mb-8">
           {displayServices.map((_, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
-              animate={{ 
+              animate={{
                 width: activeIndex === idx ? 24 : 8,
                 backgroundColor: activeIndex === idx ? "#7c3aed" : "#cbd5e1",
                 opacity: activeIndex === idx ? 1 : 0.5
@@ -363,9 +335,9 @@ const Services = ({ onTreatmentSelect = () => {} }) => {
       </div>
 
       {selectedService && (
-        <ServiceModal 
-          service={selectedService} 
-          onClose={handleCloseModal} 
+        <ServiceModal
+          service={selectedService}
+          onClose={handleCloseModal}
           onSelect={handleSelectTreatment}
         />
       )}
