@@ -1,19 +1,22 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
 import { GraduationCap, Award, Sparkles } from 'lucide-react';
-import vivianaFoto from '../assets/viviana-about.webp'; // Asegurate que la ruta sea correcta
+// Usamos Framer Motion SOLO para el Parallax (scroll sincronizado), que es muy eficiente.
+import { motion, useScroll, useTransform } from 'framer-motion';
+import vivianaFoto from '../assets/viviana-about.webp';
 
 const About = () => {
   const sectionRef = useRef(null);
 
+  // --- LÓGICA PARALLAX (Sincronizado con el scroll) ---
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   });
 
-  // PARALLAX: Movimiento lateral suave
-  const xViviana = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const xMarco = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  // Transformamos el progreso del scroll en movimiento horizontal (X)
+  // Usamos porcentajes para que sea responsive y suave
+  const xViviana = useTransform(scrollYProgress, [0, 1], ["0%", "-15%"]);
+  const xMarco = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
   const credentials = [
     {
@@ -36,21 +39,22 @@ const About = () => {
   return (
     <section id="about" ref={sectionRef} className="relative py-12 md:py-24 overflow-hidden">
 
-      {/* --- BACKGROUND PARALLAX TEXT --- */}
+      {/* --- BACKGROUND PARALLAX TEXT (Activado) --- */}
+      {/* Usamos will-change-transform para decirle al navegador que prepare la GPU */}
       <motion.div
         style={{ x: xViviana }}
-        className="absolute top-0 left-0 pointer-events-none select-none z-0"
+        className="absolute top-0 left-0 pointer-events-none select-none z-0 opacity-[0.03] will-change-transform"
       >
-        <span className="text-[5rem] md:text-[12rem] lg:text-[14rem] font-black text-slate-900/5 leading-none tracking-tighter block whitespace-nowrap ml-[-2vw]">
+        <span className="text-[5rem] md:text-[12rem] lg:text-[14rem] font-black text-slate-900 leading-none tracking-tighter block whitespace-nowrap ml-[-2vw]">
           VIVIANA
         </span>
       </motion.div>
 
       <motion.div
         style={{ x: xMarco }}
-        className="absolute bottom-0 right-0 pointer-events-none select-none z-0"
+        className="absolute bottom-0 right-0 pointer-events-none select-none z-0 opacity-[0.03] will-change-transform"
       >
-        <span className="text-[5rem] md:text-[12rem] lg:text-[14rem] font-black text-slate-900/5 leading-none tracking-tighter block whitespace-nowrap mr-[-2vw]">
+        <span className="text-[5rem] md:text-[12rem] lg:text-[14rem] font-black text-slate-900 leading-none tracking-tighter block whitespace-nowrap mr-[-2vw]">
           MARCO
         </span>
       </motion.div>
@@ -61,35 +65,29 @@ const About = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-0 items-center">
 
           {/* --- 1. FOTO --- */}
-          <div className="md:col-span-7 relative w-full flex justify-center md:block">
-            <motion.div
-              // FIX: CAMBIAMOS CLIP-PATH POR SCALE + Y
-              // Esto mantiene los bordes redondeados siempre visibles y perfectos
-              initial={{ opacity: 0, scale: 0.9, y: 50 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-
-              viewport={{ once: true, amount: 0.4 }} // Espera a que se vea el 40% de la foto
-              transition={{ duration: 0.8, ease: "easeOut" }} // Animación fluida de menos de 1 segundo
-
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 1.02 }}
-
-              className="relative w-full max-w-md md:max-w-full aspect-[4/5] md:h-[650px] md:aspect-auto rounded-[2.5rem] overflow-hidden group shadow-2xl shadow-slate-900/5 border-[6px] border-white"
-            >
-            <img 
-              src={vivianaFoto} 
-              alt="Dra. Viviana Marco"
-              // OPTIMIZACIÓN: Lazy load para ahorrar datos iniciales
-              loading="lazy" 
-              decoding="async"
-              // Asegúrate de mantener tus clases originales
-              className="...tus clases originales..." 
-            />
+          {/* Usamos AOS para la entrada (Fade In), mucho más ligero que Framer Motion whileInView */}
+          <div
+            className="md:col-span-7 relative w-full flex justify-center md:block"
+            data-aos="fade-right"
+            data-aos-duration="1000"
+          >
+            <div className="relative w-full max-w-md md:max-w-full aspect-[4/5] md:h-[650px] md:aspect-auto rounded-[2.5rem] overflow-hidden group shadow-2xl shadow-slate-900/5 border-[6px] border-white transition-transform duration-500 hover:scale-[1.01]">
+              <img
+                src={vivianaFoto}
+                alt="Dra. Viviana Marco"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover object-top"
+              />
               <div className="absolute inset-0 bg-purple-900/10 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700"></div>
-            </motion.div>
+            </div>
 
             {/* DECORACIÓN LATERAL (Solo Desktop) */}
-            <div className="absolute -right-12 bottom-20 hidden md:flex flex-col items-center gap-6 opacity-60">
+            <div
+              className="absolute -right-12 bottom-20 hidden md:flex flex-col items-center gap-6 opacity-60"
+              data-aos="fade-in"
+              data-aos-delay="400"
+            >
               <span className="text-xs font-bold uppercase tracking-[0.3em] [writing-mode:vertical-rl] text-slate-800">Ortodoncia</span>
               <span className="h-12 w-px bg-slate-800"></span>
               <span className="text-xs font-bold uppercase tracking-[0.3em] [writing-mode:vertical-rl] text-slate-800">Estética</span>
@@ -97,23 +95,17 @@ const About = () => {
           </div>
 
           {/* --- 2. TARJETA DE TEXTO --- */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="md:col-span-5 md:-ml-24 relative z-20 mt-2 md:mt-0 "
+          <div
+            className="md:col-span-5 md:-ml-24 relative z-20 mt-2 md:mt-0"
+            data-aos="fade-left"
+            data-aos-duration="1000"
+            data-aos-delay="200"
           >
-            {/* CARD INTERACTIVA */}
-            <motion.div
-              whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)" }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-white/90 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-900/5 relative overflow-hidden"
-            >
+            {/* CARD: Estilos estáticos + Hover CSS */}
+            <div className="bg-white/90 backdrop-blur-md p-8 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-900/5 relative overflow-hidden transition-all duration-300 md:hover:-translate-y-1 md:hover:shadow-2xl">
 
               {/* Glow decorativo */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
 
               <div className="flex items-center gap-3 mb-6">
                 <span className="h-px w-8 bg-purple-600"></span>
@@ -134,31 +126,24 @@ const About = () => {
               {/* Credenciales */}
               <div className="space-y-4">
                 {credentials.map((cred, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    whileHover={{ x: 10, backgroundColor: "rgba(255, 255, 255, 0.5)" }}
-                    whileTap={{ x: 10, backgroundColor: "rgba(255, 255, 255, 0.5)" }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className="flex items-start gap-4 p-3 -mx-3 rounded-2xl transition-colors cursor-default group"
+                    className="flex items-start gap-4 p-3 -mx-3 rounded-2xl transition-all duration-200 hover:bg-white/50 hover:translate-x-2 group cursor-default"
                   >
-                    <motion.div
-                      whileHover={{ rotate: 15, scale: 1.1 }}
-                      whileTap={{ rotate: 15, scale: 1.1 }}
-                      className="mt-1 p-2.5 rounded-2xl bg-slate-50 text-slate-400 group-hover:text-purple-600 group-hover:bg-purple-100 transition-colors duration-300 shadow-sm"
-                    >
+                    <div className="mt-1 p-2.5 rounded-2xl bg-slate-50 text-slate-400 group-hover:text-purple-600 group-hover:bg-purple-100 transition-all duration-300 shadow-sm group-hover:scale-110 group-hover:rotate-6">
                       <cred.icon size={20} />
-                    </motion.div>
+                    </div>
 
                     <div>
                       <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 group-hover:text-purple-400 transition-colors">{cred.label}</h4>
                       <p className="text-sm font-semibold text-slate-800 leading-tight">{cred.text}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-// ELIMINADO: import { InlineWidget } from 'react-calendly';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MessageCircle, ArrowRight, Sparkles, ShieldCheck } from 'lucide-react';
+// Mantenemos framer-motion SOLO para la transición interna de pestañas y el form
+import { motion, AnimatePresence } from 'framer-motion';
 
 // --- COMPONENTE INTERNO: SWITCH ---
 const LiquidSwitch = ({ activeTab, setActiveTab }) => {
@@ -25,7 +25,7 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
           >
             {isActive && (
               <motion.div
-                layoutId="active-pill"
+                layoutId="active-pill-booking"
                 className="absolute inset-0 bg-violet-600 rounded-full shadow-md z-10"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
@@ -70,14 +70,12 @@ const BookingUnified = ({ initialTreatment }) => {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Variantes para animación escalonada (Stagger)
+  // Variantes internas (Formulario)
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+      transition: { staggerChildren: 0.1 }
     }
   };
 
@@ -90,12 +88,12 @@ const BookingUnified = ({ initialTreatment }) => {
     <section id="booking" className="relative py-12 md:pt-24 md:pb-20 z-10 overflow-visible">
       <div className="max-w-5xl mx-auto px-6">
 
-        {/* HEADER */}
+        {/* HEADER CON ANIMACIÓN DIFERENTE */}
         <div className="text-center mb-12 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          {/* CAMBIO: 'zoom-in' para dar énfasis al título */}
+          <div
+            data-aos="zoom-in"
+            data-aos-duration="1000"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">
               Agenda tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">experiencia.</span>
@@ -103,15 +101,27 @@ const BookingUnified = ({ initialTreatment }) => {
             <p className="text-slate-500 text-[15px] md:text-lg font-light max-w-2xl mx-auto leading-7">
               Tecnología y calidez humana. Elegí el canal que prefieras.
             </p>
-          </motion.div>
+          </div>
 
-          <div className="flex justify-center">
+          {/* CAMBIO: 'zoom-in' con delay para el botón switcher */}
+          <div
+            className="flex justify-center"
+            data-aos="zoom-in"
+            data-aos-delay="200"
+          >
             <LiquidSwitch activeTab={bookingMode} setActiveTab={setBookingMode} />
           </div>
         </div>
 
-        {/* CONTENIDO DINÁMICO */}
-        <div className="min-h-[600px] relative">
+        {/* CONTENIDO PRINCIPAL */}
+        {/* CAMBIO: 'zoom-in-up' hace que el formulario crezca desde abajo hacia el usuario. 
+            Se siente más dinámico que un simple fade. */}
+        <div
+          className="min-h-[600px] relative"
+          data-aos="zoom-in-up"
+          data-aos-duration="800"
+          data-aos-delay="300"
+        >
           <AnimatePresence mode="wait">
 
             {/* OPCIÓN A: WHATSAPP FORM */}
@@ -124,7 +134,7 @@ const BookingUnified = ({ initialTreatment }) => {
                 transition={{ duration: 0.4 }}
                 className="max-w-xl mx-auto"
               >
-                <div className="relative bg-white/60 backdrop-blur-2xl border border-slate-200 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-violet-900/5 transition-all duration-500">
+                <div className="relative bg-white/60 backdrop-blur-md border border-slate-200 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-violet-900/5 transition-all duration-500">
 
                   {/* HEADER DEL FORMULARIO */}
                   <div className="flex items-center gap-5 mb-8">

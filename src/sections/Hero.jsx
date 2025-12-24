@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, CalendarCheck, Sparkles } from 'lucide-react';
+// Mantenemos framer-motion SOLO para la física del Tilt en PC y el carrusel de texto pequeño
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import consultorioHeader from '../assets/consultorio-hero.webp';
 
@@ -31,34 +32,30 @@ const allClientFaces = [
 ];
 
 const Hero = () => {
-  // 1. DETECCIÓN DE MÓVIL
+  // 1. DETECCIÓN DE MÓVIL (Para desactivar Tilt 3D)
   const [isMobile, setIsMobile] = useState(true);
 
-useEffect(() => {
+  useEffect(() => {
     const media = window.matchMedia('(max-width: 1023px)');
-    
     const updateMobile = (e) => setIsMobile(e.matches);
-    
-    setIsMobile(media.matches); // Valor inicial
-    media.addEventListener('change', updateMobile); // Listener optimizado
-    
+
+    setIsMobile(media.matches);
+    media.addEventListener('change', updateMobile);
     return () => media.removeEventListener('change', updateMobile);
   }, []);
 
-  // 2. LÓGICA 3D TILT (SOLO PARA PC)
+  // 2. LÓGICA 3D TILT (SOLO PARA PC - USANDO MOTION VALUES PARA PERFORMANCE)
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // Suavizado del movimiento del mouse (Spring physics)
   const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
   const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
 
-  // Transformamos posición del mouse en rotación (grados)
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
 
   const handleMouseMove = (e) => {
-    if (isMobile) return; // En móvil no calculamos nada
+    if (isMobile) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -76,14 +73,14 @@ useEffect(() => {
     y.set(0);
   };
 
-  // --- RESTO DE LÓGICA (TEXTOS, ETC) ---
+  // --- DATA ---
   const [heroContent] = useState(() => {
+    // Selección aleatoria solo al montar (SSR safe)
     const randomIndex = Math.floor(Math.random() * heroVariants.length);
     return heroVariants[randomIndex];
   });
 
   const [clientFaces] = useState(() => allClientFaces.slice(0, 3));
-
   const badges = ["Especialista U.B.A.", "Ortodoncia Invisible", "Armonización Facial"];
   const [index, setIndex] = useState(0);
 
@@ -100,10 +97,12 @@ useEffect(() => {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full h-full lg:py-0">
 
         {/* --- COLUMNA TEXTO --- */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+        {/* REEMPLAZO FRAMER MOTION POR AOS */}
+        {/* data-aos-delay="600": Espera a que la Splash Screen empiece a irse */}
+        <div
+          data-aos="fade-up"
+          data-aos-duration="1000"
+          data-aos-delay="600"
           className="relative z-10 flex flex-col h-full lg:h-auto justify-between lg:justify-center items-center lg:items-start text-center lg:text-left pt-28 pb-10 lg:py-0"
         >
           {/* BADGE */}
@@ -198,25 +197,26 @@ useEffect(() => {
             </div>
           </div>
 
-        </motion.div>
+        </div>
 
-        {/* --- COLUMNA IMAGEN (HÍBRIDA: STATIC MOBILE / 3D PC) --- */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+        {/* --- COLUMNA IMAGEN --- */}
+        {/* AOS ENTRANCE: Se desliza desde la izquierda */}
+        <div
+          data-aos="fade-left"
+          data-aos-duration="1000"
+          data-aos-delay="800"
           className="hidden lg:flex relative w-full justify-center lg:justify-end lg:pl-10 items-center h-full"
-          style={{ perspective: 1000 }} // IMPORTANTE: Perspectiva para el 3D
+          style={{ perspective: 1000 }}
         >
-          {/* CONTENEDOR INTERACTIVO */}
+          {/* CONTENEDOR INTERACTIVO 3D (SOLO PC) */}
           <motion.div
             className="relative z-0 group w-full max-w-xl aspect-[4/5]"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            style={!isMobile ? { rotateX, rotateY, transformStyle: "preserve-3d" } : {}} // Solo aplica 3D si NO es móvil
+            style={!isMobile ? { rotateX, rotateY, transformStyle: "preserve-3d" } : {}}
           >
 
-            {/* BORDE FLOTANTE (Con efecto Parallax en PC) */}
+            {/* BORDE FLOTANTE (Parallax en PC) */}
             <motion.div
               animate={!isMobile ? {
                 x: [30, 45, 30],
@@ -225,11 +225,10 @@ useEffect(() => {
               } : {}}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
               className="absolute inset-0 w-full h-full border-[2px] border-slate-300 rounded-[2.5rem] z-0 transition-colors duration-700 ease-out"
-              style={!isMobile ? { translateZ: -50 } : {}} // Profundidad 3D
+              style={!isMobile ? { translateZ: -50 } : {}}
             />
 
             {/* IMAGEN PRINCIPAL */}
-{/* IMAGEN PRINCIPAL */}
             <div
               className="relative z-10 w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 border-[10px] border-white ring-1 ring-slate-200"
               style={!isMobile ? { transform: "translateZ(20px)" } : {}}
@@ -237,23 +236,20 @@ useEffect(() => {
               <img
                 src={consultorioHeader}
                 alt="Dra. Viviana Marco Consultorio"
-                // OPTIMIZACIÓN: 
-                // 1. fetchPriority="high": Le dice al navegador que esta es la imagen más importante (React 19).
-                // 2. loading="eager": Fuerza la carga inmediata (por defecto es eager, pero mejor ser explícito).
-                // 3. decoding="async": Permite que el navegador decodifique la imagen sin congelar el scroll.
                 fetchPriority="high"
                 loading="eager"
                 decoding="async"
                 className="w-full h-full object-cover will-change-transform"
               />
-              {/* BRILLO GLOSSY AL PASAR EL MOUSE (SOLO PC) */}
+
+              {/* BRILLO GLOSSY (SOLO PC) */}
               {!isMobile && (
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay" />
               )}
             </div>
 
           </motion.div>
-        </motion.div>
+        </div>
 
       </div>
     </section>

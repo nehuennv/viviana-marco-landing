@@ -3,15 +3,15 @@ import { Instagram, Facebook, ArrowUp, MapPin, Mail, Phone } from 'lucide-react'
 import { motion } from 'framer-motion';
 
 const Footer = () => {
-  
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <footer className="relative bg-gradient-to-br from-slate-900 to-indigo-950 text-white pt-24 pb-8 rounded-t-[3rem] md:rounded-t-[5rem] overflow-hidden">
-      
-      {/* 1. WATERMARK */}
+
+      {/* 1. WATERMARK (FONDO INTACTO - SIN ANIMACIONES PARA NO ROMPERLO) */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.02]">
         <h1 className="text-[15vw] font-bold font-heading leading-none tracking-tighter text-white whitespace-nowrap">
           VIVIANA MARCO
@@ -23,14 +23,17 @@ const Footer = () => {
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        
+
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-10 mb-16">
-          
-          <div className="max-w-2xl text-center md:text-left">
-            {/* COPYWRITING CORREGIDO: Neutro y con Autoridad */}
+
+          {/* TEXTO (Con animación suave solo aquí) */}
+          <div
+            className="max-w-2xl text-center md:text-left md:pl-2"
+            data-aos="fade-up"
+          >
             <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6 leading-tight">
-              Tu nueva imagen <br/>
+              Tu nueva imagen <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
                 comienza hoy.
               </span>
@@ -40,24 +43,33 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* BOTÓN "LIGHT" */}
-          <motion.button 
-            onClick={scrollToTop}
-            whileHover={{ scale: 1.05, y: -5 }} 
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className="group w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-full bg-white text-indigo-950 flex flex-col items-center justify-center gap-1 font-bold text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-colors duration-300 shadow-2xl shadow-white/10"
+          {/* BOTÓN "SUBIR" - Oculto en móvil (hidden md:flex) */}
+          <div
+            className="hidden md:block"
+            data-aos="zoom-in"
+            data-aos-delay="200"
           >
-            <ArrowUp size={24} className="group-hover:-translate-y-1 transition-transform duration-300" />
-            Subir
-          </motion.button>
+            <motion.button
+              onClick={scrollToTop}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="group w-24 h-24 flex-shrink-0 rounded-full bg-white text-indigo-950 flex flex-col items-center justify-center gap-1 font-bold text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-colors duration-300 shadow-2xl shadow-white/10"
+            >
+              <ArrowUp size={24} className="group-hover:-translate-y-1 transition-transform duration-300" />
+              Subir
+            </motion.button>
+          </div>
         </div>
 
         {/* --- DARK BENTO GRID --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-12">
-          
+
           {/* CARD MENU */}
-          <div className="md:col-span-3 bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/10 transition-colors duration-300">
+          <div
+            className="md:col-span-3 bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/10 transition-colors duration-300"
+            data-aos="fade-up"
+          >
             <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">Menu</h4>
             <ul className="space-y-4 font-medium">
               <FooterLink href="#home">Inicio</FooterLink>
@@ -68,7 +80,11 @@ const Footer = () => {
           </div>
 
           {/* CARD CONTACTO */}
-          <div className="md:col-span-4 bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl p-8 flex flex-col justify-between hover:bg-white/10 transition-colors duration-300 group">
+          <div
+            className="md:col-span-4 bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl p-8 flex flex-col justify-between hover:bg-white/10 transition-colors duration-300 group"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
             <div>
               <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">Contacto</h4>
               <div className="space-y-4">
@@ -80,7 +96,7 @@ const Footer = () => {
                 </a>
               </div>
             </div>
-            
+
             <div className="mt-8 pt-6 border-t border-white/10 flex gap-3">
               <SocialIcon icon={<Instagram />} />
               <SocialIcon icon={<Facebook />} />
@@ -88,9 +104,13 @@ const Footer = () => {
           </div>
 
           {/* CARD MAPA */}
-          <div className="md:col-span-5 bg-slate-800/50 border border-white/10 rounded-3xl p-8 relative overflow-hidden group min-h-[250px]">
+          <div
+            className="md:col-span-5 bg-slate-800/50 border border-white/10 rounded-3xl p-8 relative overflow-hidden group min-h-[250px]"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
             <svg className="absolute inset-0 w-full h-full opacity-20 group-hover:opacity-30 transition-opacity duration-500 scale-125" viewBox="0 0 100 100">
-               <path d="M0 0 L100 100 M100 0 L0 100 M50 0 L50 100 M0 50 L100 50" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+              <path d="M0 0 L100 100 M100 0 L0 100 M50 0 L50 100 M0 50 L100 50" stroke="currentColor" strokeWidth="0.5" className="text-white" />
             </svg>
             <div className="absolute inset-0 bg-gradient-to-t from-indigo-950 via-transparent to-transparent"></div>
 
@@ -108,21 +128,19 @@ const Footer = () => {
 
         </div>
 
-        {/* COPYRIGHT BAR (LIMPIO: Sin términos y privacidad) */}
+        {/* COPYRIGHT BAR */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium uppercase tracking-widest text-center md:text-left">
           <p>© {new Date().getFullYear()} Dra. Viviana Marco.</p>
-          
-          {/* ELIMINADO EL DIV DE LINKS DE PRIVACIDAD */}
-          
           <p>
             Designed by{' '}
-            <a 
-              href="https://vantradigital.com/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-primary hover:text-white transition-colors font-bold"
+            <a
+              href="https://vantradigital.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              // CAMBIO DE COLOR: Verde Lima (#E8EF41)
+              className="text-[#E8EF41] hover:text-white transition-colors font-bold"
             >
-              Vantra 
+              Vantra
             </a>
           </p>
         </div>
@@ -132,7 +150,7 @@ const Footer = () => {
   );
 };
 
-// Micro-componentes
+// Micro-componentes (Sin cambios)
 const FooterLink = ({ href, children }) => (
   <li>
     <a href={href} className="group flex items-center justify-between text-slate-300 hover:text-white transition-colors">

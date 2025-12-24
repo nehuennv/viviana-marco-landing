@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Smile, Sparkles, Syringe, Moon, Zap, User, ArrowUpRight, Sparkle, Activity, ScanFace } from 'lucide-react';
+// CORRECCIÓN: Agregada 'Sparkle' a los imports que faltaba
+import { Smile, Sparkles, Syringe, Moon, Zap, User, ArrowUpRight, Activity, ScanFace, Sparkle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ServiceModal from '../components/ServiceModal';
 
@@ -100,7 +101,11 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="inline-flex bg-white/50 backdrop-blur-md p-1.5 rounded-full border border-slate-100/50 shadow-sm relative">
+    <div
+      className="inline-flex bg-white/50 backdrop-blur-md p-1.5 rounded-full border border-slate-100/50 shadow-sm relative"
+      data-aos="fade-up"
+      data-aos-delay="200"
+    >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -136,7 +141,6 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{
       opacity: 1,
-      // Escala solo en móvil si es el centro, en desktop fijo
       scale: isCenter ? 1 : 0.9,
     }}
     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -145,19 +149,15 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
     <div
       onClick={() => onClick(service)}
       className="group relative cursor-pointer rounded-[2rem] p-6 md:p-8 h-full flex flex-col overflow-hidden
-                 /* Mobile First: Con gradiente y sin sombra */
                  bg-gradient-to-br from-white via-violet-50/30 to-purple-50/20
                  border border-violet-200/60 
                  shadow-none
                  
-                 /* Desktop: Blanco puro, sombra suave y efectos hover */
                  md:bg-white
                  md:border-slate-200 
                  md:shadow-sm
                  
                  transition-all duration-300 active:scale-[0.98]
-                 
-                 /* Hover solo en desktop */
                  md:hover:bg-white md:hover:border-violet-200 md:hover:shadow-2xl md:hover:shadow-violet-500/20 md:hover:scale-[1.02]
                  "
     >
@@ -208,24 +208,16 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
 const Services = ({ onTreatmentSelect = () => { } }) => {
   const [selectedService, setSelectedService] = useState(null);
   const [activeTab, setActiveTab] = useState('facial');
-
-  // --- ARREGLO DEL CARRUSEL ---
-  // Usamos 'useState' en lugar de 'useRef' para guardar el contenedor.
-  // Esto se llama "Callback Ref". Al cambiar el DOM (cuando cambias de tab), 
-  // React actualiza este estado y fuerza a que el Observer se reconecte SI o SI.
   const [scrollContainer, setScrollContainer] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const displayServices = activeTab === 'facial' ? facialAesthetics : orthodontics;
 
-  // Resetear índice al cambiar de tab
   useEffect(() => {
     setActiveIndex(0);
   }, [activeTab]);
 
-  // Observer Sólido como una roca
   useEffect(() => {
-    // Si todavía no se montó el nuevo contenedor, esperamos.
     if (!scrollContainer) return;
 
     const observer = new IntersectionObserver(
@@ -233,7 +225,6 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const index = entry.target.dataset.index;
-            // Evitamos que el div espaciador rompa la lógica
             if (index !== undefined && index !== null) {
               setActiveIndex(Number(index));
             }
@@ -241,12 +232,11 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
         });
       },
       {
-        root: scrollContainer, // Usamos la referencia actualizada del estado
+        root: scrollContainer,
         threshold: 0.5
       }
     );
 
-    // Observamos solo las tarjetas reales
     Array.from(scrollContainer.children).forEach((child) => {
       if (child.hasAttribute('data-index')) {
         observer.observe(child);
@@ -254,7 +244,7 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
     });
 
     return () => observer.disconnect();
-  }, [scrollContainer, displayServices]); // Dependencias vitales para que se reconecte
+  }, [scrollContainer, displayServices]);
 
   const handleCardClick = (service) => {
     setSelectedService(service);
@@ -280,23 +270,32 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
 
         {/* --- HEADER --- */}
         <div className="text-center mb-12 px-6">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+
+          {/* Badge con AOS */}
+          <div
             className={badgeClass}
+            data-aos="fade-down"
           >
             <div className="bg-primary/10 p-1 rounded-full text-primary">
               <Sparkle size={12} fill="currentColor" />
             </div>
             <span>Nuestros Servicios</span>
-          </motion.div>
+          </div>
 
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+          {/* Título con AOS */}
+          <h2
+            className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
             Estética & <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-400">Salud Integral.</span>
           </h2>
 
-          <p className="text-lg text-slate-500 font-light max-w-2xl mx-auto leading-relaxed mb-10">
+          <p
+            className="text-lg text-slate-500 font-light max-w-2xl mx-auto leading-relaxed mb-10"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
             Descubrí la fusión perfecta entre tecnología digital y calidez humana.
           </p>
 
@@ -305,8 +304,13 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
           </div>
         </div>
 
-        {/* --- CONTENIDO --- */}
-        <div>
+        {/* --- CONTENIDO (Carrusel) --- */}
+        {/* Usamos un div wrapper para el AOS, así no interfiere con el motion.div interno */}
+        <div
+          data-aos="fade-up"
+          data-aos-delay="300"
+          className="relative" // IMPORTANTE: relative aquí ayuda a contener el layout
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -315,12 +319,10 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
 
-              // AQUÍ ESTÁ LA MAGIA: Pasamos el 'setter' del estado como ref.
-              // Esto captura el elemento nuevo inmediatamente cuando nace.
               ref={setScrollContainer}
 
               className="
-                  relative
+                  relative /* REQUERIDO POR FRAMER MOTION */
                   flex 
                   md:flex-wrap md:justify-center 
                   gap-4 md:gap-6
@@ -342,7 +344,6 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
                 </div>
               ))}
 
-              {/* Espaciador final corregido para no molestar al observer */}
               <div className="w-1 md:hidden flex-shrink-0" />
             </motion.div>
           </AnimatePresence>
