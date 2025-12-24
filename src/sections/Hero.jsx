@@ -34,11 +34,15 @@ const Hero = () => {
   // 1. DETECCIÓN DE MÓVIL
   const [isMobile, setIsMobile] = useState(true);
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+useEffect(() => {
+    const media = window.matchMedia('(max-width: 1023px)');
+    
+    const updateMobile = (e) => setIsMobile(e.matches);
+    
+    setIsMobile(media.matches); // Valor inicial
+    media.addEventListener('change', updateMobile); // Listener optimizado
+    
+    return () => media.removeEventListener('change', updateMobile);
   }, []);
 
   // 2. LÓGICA 3D TILT (SOLO PARA PC)
@@ -225,16 +229,23 @@ const Hero = () => {
             />
 
             {/* IMAGEN PRINCIPAL */}
+{/* IMAGEN PRINCIPAL */}
             <div
               className="relative z-10 w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 border-[10px] border-white ring-1 ring-slate-200"
-              style={!isMobile ? { transform: "translateZ(20px)" } : {}} // La imagen "sale" hacia afuera en PC
+              style={!isMobile ? { transform: "translateZ(20px)" } : {}}
             >
               <img
                 src={consultorioHeader}
                 alt="Dra. Viviana Marco Consultorio"
+                // OPTIMIZACIÓN: 
+                // 1. fetchPriority="high": Le dice al navegador que esta es la imagen más importante (React 19).
+                // 2. loading="eager": Fuerza la carga inmediata (por defecto es eager, pero mejor ser explícito).
+                // 3. decoding="async": Permite que el navegador decodifique la imagen sin congelar el scroll.
+                fetchPriority="high"
+                loading="eager"
+                decoding="async"
                 className="w-full h-full object-cover will-change-transform"
               />
-
               {/* BRILLO GLOSSY AL PASAR EL MOUSE (SOLO PC) */}
               {!isMobile && (
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay" />

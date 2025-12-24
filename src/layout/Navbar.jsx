@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // Agregamos useRef
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { CalendarCheck, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
@@ -24,7 +24,7 @@ const Navbar = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true }); // passive: true mejora performance en móviles
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -131,7 +131,6 @@ const Navbar = () => {
                        px-6 py-2.5 shrink-0 cursor-pointer border-none"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            {/* Quitamos la animación infinita 'shimmer' aquí si la hubiera, para ahorrar recursos */}
 
             <span className="relative z-20 flex items-center gap-2 text-xs font-bold uppercase tracking-wide whitespace-nowrap">
               <CalendarCheck size={14} className="text-purple-200 group-hover:text-white transition-all duration-300" />
@@ -139,12 +138,14 @@ const Navbar = () => {
             </span>
           </motion.a>
 
-          {/* HAMBURGUESA */}
+          {/* HAMBURGUESA MODIFICADA */}
           <motion.button
             initial={false}
             animate={isOpen ? "open" : "closed"}
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative w-10 h-10 rounded-full bg-white/50 border border-white/40 backdrop-blur-md flex items-center justify-center text-slate-800 hover:bg-white transition-colors shadow-sm"
+            // CAMBIO AQUÍ: Eliminamos bg-white/50, border, shadow, backdrop-blur y rounded-full.
+            // Dejamos w-10 h-10 para mantener el área táctil cómoda.
+            className="md:hidden relative w-10 h-10 flex items-center justify-center text-slate-800 focus:outline-none"
           >
             <MotionConfig transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}>
               <div className="relative w-5 h-5 flex flex-col justify-center gap-[5px]">
@@ -189,7 +190,6 @@ const MobileMenuPortal = ({ isOpen, onClose, links, handleNavClick }) => {
           animate={{ opacity: 1, clipPath: "circle(150% at 100% 0%)" }}
           exit={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          // Optimización: Usamos will-change para evitar tirones en la animación de apertura
           className="fixed inset-0 z-[50] bg-white/95 backdrop-blur-3xl flex flex-col justify-center items-center will-change-[clip-path]"
         >
           {/* Fondo estático en móvil para evitar lag */}
@@ -241,4 +241,4 @@ const MobileMenuPortal = ({ isOpen, onClose, links, handleNavClick }) => {
   );
 };
 
-export default Navbar;
+export default Navbar;    

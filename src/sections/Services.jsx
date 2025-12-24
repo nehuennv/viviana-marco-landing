@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Smile, Sparkles, Syringe, Moon, Zap, User, ArrowUpRight, Sparkle, Activity, ScanFace } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ServiceModal from '../components/ServiceModal';
 
-// --- DATA OPTIMIZADA (WebP + width=600) ---
+// --- DATA ---
 const facialAesthetics = [
   {
     id: 'f1',
@@ -133,25 +133,33 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
 // --- SERVICE CARD ---
 const ServiceCard = ({ service, onClick, isCenter }) => (
   <motion.div
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{
       opacity: 1,
+      // Escala solo en móvil si es el centro, en desktop fijo
       scale: isCenter ? 1 : 0.9,
     }}
-    exit={{ opacity: 0, scale: 0.95 }}
     transition={{ duration: 0.5, ease: "easeOut" }}
     className="min-w-[280px] w-[280px] md:min-w-0 md:w-[350px] snap-center h-full flex-shrink-0 md:!scale-100 md:!opacity-100"
   >
     <div
       onClick={() => onClick(service)}
       className="group relative cursor-pointer rounded-[2rem] p-6 md:p-8 h-full flex flex-col overflow-hidden
+                 /* Mobile First: Con gradiente y sin sombra */
                  bg-gradient-to-br from-white via-violet-50/30 to-purple-50/20
+                 border border-violet-200/60 
+                 shadow-none
+                 
+                 /* Desktop: Blanco puro, sombra suave y efectos hover */
                  md:bg-white
-                 border border-violet-200/60 md:border-slate-200 
-                 hover:bg-white hover:border-violet-200 hover:shadow-2xl hover:shadow-violet-500/20
-                 transition-colors duration-300 shadow-md md:shadow-sm active:scale-[0.98] transition-transform"
-
+                 md:border-slate-200 
+                 md:shadow-sm
+                 
+                 transition-all duration-300 active:scale-[0.98]
+                 
+                 /* Hover solo en desktop */
+                 md:hover:bg-white md:hover:border-violet-200 md:hover:shadow-2xl md:hover:shadow-violet-500/20 md:hover:scale-[1.02]
+                 "
     >
       <div className="absolute inset-0 -translate-x-[150%] skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1s_ease-in-out]" />
 
@@ -170,10 +178,10 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
           <span className="relative z-10">{service.icon}</span>
         </div>
         <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest 
-                       text-violet-700 bg-violet-100 border border-violet-200/50
-                       md:text-violet-600 md:bg-violet-50 md:border-violet-100
-                       md:group-hover:text-violet-700 md:group-hover:bg-violet-100 md:group-hover:border-violet-200
-                       transition-all duration-500 ease-in-out px-3 py-1 rounded-full">
+                        text-violet-700 bg-violet-100 border border-violet-200/50
+                        md:text-violet-600 md:bg-violet-50 md:border-violet-100
+                        md:group-hover:text-violet-700 md:group-hover:bg-violet-100 md:group-hover:border-violet-200
+                        transition-all duration-500 ease-in-out px-3 py-1 rounded-full">
           {service.category}
         </span>
       </div>
@@ -201,34 +209,52 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
   const [selectedService, setSelectedService] = useState(null);
   const [activeTab, setActiveTab] = useState('facial');
 
-  const scrollRef = useRef(null);
+  // --- ARREGLO DEL CARRUSEL ---
+  // Usamos 'useState' en lugar de 'useRef' para guardar el contenedor.
+  // Esto se llama "Callback Ref". Al cambiar el DOM (cuando cambias de tab), 
+  // React actualiza este estado y fuerza a que el Observer se reconecte SI o SI.
+  const [scrollContainer, setScrollContainer] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const displayServices = activeTab === 'facial' ? facialAesthetics : orthodontics;
 
-  const handleScroll = () => {
-    if (scrollRef.current) {
-      const container = scrollRef.current;
-      const scrollLeft = container.scrollLeft;
-      const containerCenter = scrollLeft + (container.offsetWidth / 2);
+  // Resetear índice al cambiar de tab
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [activeTab]);
 
-      let closestIndex = 0;
-      let closestDistance = Infinity;
+  // Observer Sólido como una roca
+  useEffect(() => {
+    // Si todavía no se montó el nuevo contenedor, esperamos.
+    if (!scrollContainer) return;
 
-      Array.from(container.children).forEach((child, index) => {
-        if (index >= displayServices.length) return;
-        const cardCenter = child.offsetLeft + (child.offsetWidth / 2);
-        const distance = Math.abs(containerCenter - cardCenter);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = entry.target.dataset.index;
+            // Evitamos que el div espaciador rompa la lógica
+            if (index !== undefined && index !== null) {
+              setActiveIndex(Number(index));
+            }
+          }
+        });
+      },
+      {
+        root: scrollContainer, // Usamos la referencia actualizada del estado
+        threshold: 0.5
+      }
+    );
 
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
+    // Observamos solo las tarjetas reales
+    Array.from(scrollContainer.children).forEach((child) => {
+      if (child.hasAttribute('data-index')) {
+        observer.observe(child);
+      }
+    });
 
-      setActiveIndex(closestIndex);
-    }
-  };
+    return () => observer.disconnect();
+  }, [scrollContainer, displayServices]); // Dependencias vitales para que se reconecte
 
   const handleCardClick = (service) => {
     setSelectedService(service);
@@ -246,7 +272,7 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
   };
 
   return (
-    <section id="services" className="relative py-12 md:py-32 overflow-hidden">
+    <section id="services" className="relative pt-12 pb-0 md:py-32 overflow-hidden">
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
@@ -289,28 +315,34 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
 
-              ref={scrollRef}
-              onScroll={handleScroll}
+              // AQUÍ ESTÁ LA MAGIA: Pasamos el 'setter' del estado como ref.
+              // Esto captura el elemento nuevo inmediatamente cuando nace.
+              ref={setScrollContainer}
 
               className="
+                  relative
                   flex 
                   md:flex-wrap md:justify-center 
                   gap-4 md:gap-6
                   overflow-x-auto snap-x snap-mandatory 
                   pl-[calc((100vw-280px)/2)] pr-[calc((100vw-280px)/2)]
-                  md:px-6 pb-8 md:pb-0 
+                  md:px-6 
+                  pb-8 md:pb-0 
                   hide-scrollbar
+                  scroll-smooth
                 "
             >
               {displayServices.map((service, idx) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  onClick={() => handleCardClick(service)}
-                  isCenter={idx === activeIndex}
-                />
+                <div key={service.id} data-index={idx} className="h-full">
+                  <ServiceCard
+                    service={service}
+                    onClick={() => handleCardClick(service)}
+                    isCenter={idx === activeIndex}
+                  />
+                </div>
               ))}
 
+              {/* Espaciador final corregido para no molestar al observer */}
               <div className="w-1 md:hidden flex-shrink-0" />
             </motion.div>
           </AnimatePresence>

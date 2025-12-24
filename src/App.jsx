@@ -4,28 +4,20 @@ import { AnimatePresence } from 'framer-motion';
 // Componentes
 import Navbar from './layout/Navbar';
 import Hero from './sections/Hero';
-import About from './sections/About';
-import Services from './sections/Services';
-import BookingUnified from './sections/BookingUnified';
-import Reviews from './sections/Reviews';
-import Footer from './layout/Footer';
+
+const About = React.lazy(() => import('./sections/About'));
+const Services = React.lazy(() => import('./sections/Services'));
+const BookingUnified = React.lazy(() => import('./sections/BookingUnified'));
+const Reviews = React.lazy(() => import('./sections/Reviews'));
+const Footer = React.lazy(() => import('./layout/Footer'));
 import WhatsAppBtn from './components/WhatsAppBtn';
 import MouseSpotlight from './components/MouseSpotlight';
 import BackgroundFlow from './components/BackgroundFlow';
 import SplashScreen from './components/SplashScreen';
 
 // --- ASSETS CRÍTICOS PARA PRECARGA ---
-// Importamos las versiones .webp que realmente usan los componentes
-import fotoAbout from './assets/viviana-about.webp';
 import consultorioHero from './assets/consultorio-hero.webp';
 
-const externalImages = [
-  "https://images.unsplash.com/photo-1629909613654-28e377c37b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=100&h=100&q=80"
-];
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,24 +28,16 @@ function App() {
   // ---------------------------------------------------------
   useEffect(() => {
     const loadResources = async () => {
-      // Unimos locales y externas
-      const imagesToLoad = [fotoAbout, consultorioHero, ...externalImages];
-
-      const promises = imagesToLoad.map((src) => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = resolve;
-          img.onerror = resolve; // Si falla, no bloqueamos la app
-        });
+      // OPTIMIZACIÓN: Solo bloqueamos la carga por la imagen CRÍTICA del Hero.
+      // Las imágenes de 'About' o 'Reviews' que carguen asíncronamente después.
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = consultorioHero;
+        // Resolvemos tanto en éxito como en error para no trabar la app
+        img.onload = resolve;
+        img.onerror = resolve;
       });
-
-      // Ejecutamos la carga en paralelo.
-      // No bloqueamos el setIsLoading aquí porque el SplashScreen 
-      // ya tiene su propio timer de 3s, lo cual es tiempo suficiente.
-      await Promise.all(promises);
     };
-
     loadResources();
   }, []);
 
@@ -107,13 +91,18 @@ function App() {
           <Navbar />
           <main>
             <Hero />
-            <About />
-            <Services onTreatmentSelect={handleTreatmentSelect} />
-            <Reviews />
-            <BookingUnified initialTreatment={selectedTreatment} />
+            {/* Suspense maneja la carga de los componentes lazy sin bloquear la UI */}
+            <React.Suspense fallback={<div className="h-20 w-full" />}>
+              <About />
+              <Services onTreatmentSelect={handleTreatmentSelect} />
+              <Reviews />
+              <BookingUnified initialTreatment={selectedTreatment} />
+            </React.Suspense>
           </main>
-          <Footer />
-          <WhatsAppBtn />
+
+          <React.Suspense fallback={null}>
+            <Footer />
+          </React.Suspense>          <WhatsAppBtn />
         </>
       )}
     </div>

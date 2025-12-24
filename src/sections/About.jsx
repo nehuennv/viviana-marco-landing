@@ -76,11 +76,15 @@ const About = () => {
 
               className="relative w-full max-w-md md:max-w-full aspect-[4/5] md:h-[650px] md:aspect-auto rounded-[2.5rem] overflow-hidden group shadow-2xl shadow-slate-900/5 border-[6px] border-white"
             >
-              <img
-                src={vivianaFoto}
-                alt="Dra. Viviana Marco"
-                className="w-full h-full object-cover object-top origin-top-left group-hover:scale-110 transition-transform duration-[1.5s] ease-in-out"
-              />
+            <img 
+              src={vivianaFoto} 
+              alt="Dra. Viviana Marco"
+              // OPTIMIZACIÓN: Lazy load para ahorrar datos iniciales
+              loading="lazy" 
+              decoding="async"
+              // Asegúrate de mantener tus clases originales
+              className="...tus clases originales..." 
+            />
               <div className="absolute inset-0 bg-purple-900/10 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700"></div>
             </motion.div>
 

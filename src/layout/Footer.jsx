@@ -122,7 +122,7 @@ const Footer = () => {
               rel="noopener noreferrer" 
               className="text-primary hover:text-white transition-colors font-bold"
             >
-              Vantra
+              Vantra 
             </a>
           </p>
         </div>

@@ -7,7 +7,7 @@ import { X, Clock, ShieldCheck, Sparkle, ArrowRight } from 'lucide-react';
 const badgeClass = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-widest mb-4";
 
 const ServiceModal = ({ service, onClose, onSelect }) => {
-  
+
   useEffect(() => {
     if (service) {
       document.body.style.overflow = 'hidden';
@@ -44,9 +44,9 @@ const ServiceModal = ({ service, onClose, onSelect }) => {
             border border-slate-200
           "
         >
-          
+
           {/* BOTÓN CERRAR */}
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 bg-white/80 backdrop-blur-md border border-slate-200 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all shadow-sm"
           >
@@ -55,14 +55,15 @@ const ServiceModal = ({ service, onClose, onSelect }) => {
 
           {/* COLUMNA IZQUIERDA: FOTO */}
           <div className="w-full md:w-5/12 h-64 md:h-auto relative shrink-0 bg-slate-100 border-b md:border-b-0 md:border-r border-slate-200">
-            <img 
-              src={service.image} 
-              alt={service.title} 
-              className="w-full h-full object-cover" 
+            <img
+              src={service.image}
+              alt={service.title}
+              loading="eager"
+              className="w-full h-full object-cover"
             />
             {/* Gradiente en mobile */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:hidden"></div>
-            
+
             {/* Título flotante (Solo Mobile) */}
             <div className="absolute bottom-5 left-5 md:hidden text-white z-10 pr-12">
               <div className="inline-flex px-2 py-0.5 rounded md:hidden bg-white/20 backdrop-blur-md border border-white/30 text-[10px] font-bold uppercase tracking-widest mb-2">
@@ -75,16 +76,16 @@ const ServiceModal = ({ service, onClose, onSelect }) => {
           {/* COLUMNA DERECHA: INFO + FOOTER FIJO */}
           {/* Usamos 'flex flex-col h-full overflow-hidden' para contener todo */}
           <div className="w-full md:w-7/12 flex flex-col h-full bg-white relative overflow-hidden">
-            
+
             {/* ZONA SCROLLEABLE (El contenido va acá) */}
             {/* 'flex-grow' hace que ocupe todo el espacio menos el footer */}
             <div className="flex-grow overflow-y-auto px-6 py-6 md:p-10 custom-scrollbar">
-              
+
               {/* Header Desktop */}
               <div className="hidden md:block mb-8">
                 <div className={badgeClass}>
-                   <Sparkle size={10} className="text-violet-500 fill-violet-500" />
-                   <span>{service.category}</span>
+                  <Sparkle size={10} className="text-violet-500 fill-violet-500" />
+                  <span>{service.category}</span>
                 </div>
                 <h3 className="text-3xl lg:text-4xl font-bold text-slate-800 leading-[1.1] tracking-tight">{service.title}</h3>
               </div>
@@ -102,11 +103,11 @@ const ServiceModal = ({ service, onClose, onSelect }) => {
               {/* BLOQUE 2: Proceso */}
               <div className="border border-slate-200 rounded-2xl p-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-full -z-10" />
-                
+
                 <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
                   <Clock size={14} /> Paso a paso
                 </h4>
-                
+
                 <ul className="space-y-4 relative z-10">
                   {service.steps.map((step, idx) => (
                     <li key={idx} className="flex gap-4">
@@ -120,7 +121,7 @@ const ServiceModal = ({ service, onClose, onSelect }) => {
                   ))}
                 </ul>
               </div>
-              
+
               {/* Espacio extra al final para que no quede pegado al scroll */}
               <div className="h-6"></div>
 
@@ -129,7 +130,7 @@ const ServiceModal = ({ service, onClose, onSelect }) => {
             {/* ZONA FOOTER (BOTÓN FIJO) */}
             {/* 'shrink-0' evita que se aplaste. Siempre visible abajo */}
             <div className="shrink-0 p-5 md:p-8 border-t border-slate-100 bg-white z-20">
-              <button 
+              <button
                 onClick={() => {
                   onSelect();
                   onClose();
