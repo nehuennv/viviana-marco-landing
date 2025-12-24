@@ -7,69 +7,64 @@ import SplashScreen from './components/SplashScreen';
 import BackgroundFlow from './components/BackgroundFlow';
 import WhatsAppBtn from './components/WhatsAppBtn';
 
-// --- LAZY LOADING (Carga diferida para velocidad inicial) ---
+// --- LAZY LOADING ---
 const About = React.lazy(() => import('./sections/About'));
 const Services = React.lazy(() => import('./sections/Services'));
 const BookingUnified = React.lazy(() => import('./sections/BookingUnified'));
 const Reviews = React.lazy(() => import('./sections/Reviews'));
 const Footer = React.lazy(() => import('./layout/Footer'));
 
-// --- EFECTOS VISUALES (Condicionales) ---
+// --- EFECTOS VISUALES ---
 import MouseSpotlight from './components/MouseSpotlight';
 
 // --- ASSETS CRÍTICOS ---
 import consultorioHero from './assets/consultorio-hero.webp';
 
 function App() {
-  // Estado de carga controlado por App (Robusto)
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTreatment, setSelectedTreatment] = useState("");
   const [isMobile, setIsMobile] = useState(true);
 
-  // ---------------------------------------------------------
-  // 1. DETECCIÓN DE MÓVIL (Para desactivar MouseSpotlight)
-  // ---------------------------------------------------------
+  // 1. DETECCIÓN DE MÓVIL
   useEffect(() => {
     const media = window.matchMedia('(max-width: 1024px)');
     setIsMobile(media.matches);
-
     const handler = (e) => setIsMobile(e.matches);
     media.addEventListener('change', handler);
     return () => media.removeEventListener('change', handler);
   }, []);
 
-  // ---------------------------------------------------------
-  // 2. LÓGICA DE CARGA INTELIGENTE (Window Load + Hero Image)
-  // ---------------------------------------------------------
+  // 2. LÓGICA DE CARGA INTELIGENTE (TIEMPO MÍNIMO + CARGA REAL)
   useEffect(() => {
     const handleLoad = async () => {
-      // A. Carga manual de imagen crítica
+
+      // A. Promesa de TIEMPO MÍNIMO (2.5 segundos)
+      // Esto asegura que la animación de la sonrisa (que tarda ~2s) se vea completa.
+      const minTimePromise = new Promise(resolve => setTimeout(resolve, 2500));
+
+      // B. Promesa de CARGA DE RECURSOS
       const imagePromise = new Promise((resolve) => {
         const img = new Image();
         img.src = consultorioHero;
         img.onload = resolve;
-        img.onerror = resolve;
+        img.onerror = resolve; // Si falla, seguimos igual
       });
 
-      // B. Esperamos a la imagen
-      await imagePromise;
+      // C. Esperamos a que AMBAS terminen.
+      // Si la imagen carga rápido, esperamos al timer.
+      // Si la imagen tarda mucho, el timer termina pero esperamos a la imagen.
+      await Promise.all([minTimePromise, imagePromise]);
 
-      // C. Damos un pequeño respiro (500ms) para que React pinte la UI debajo
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
+      setIsLoading(false);
     };
 
-    // Si el navegador ya cargó todo (cache o recarga rápida)
+    // Verificamos carga
     if (document.readyState === 'complete') {
       handleLoad();
     } else {
-      // Si no, esperamos el evento oficial
       window.addEventListener('load', handleLoad);
-
-      // Fallback de seguridad: Si algo falla, abrir la app a los 4 segundos sí o sí
-      const timeoutFallback = setTimeout(() => setIsLoading(false), 4000);
-
+      // Fallback de seguridad (máximo 5s por si algo se traba)
+      const timeoutFallback = setTimeout(() => setIsLoading(false), 5000);
       return () => {
         window.removeEventListener('load', handleLoad);
         clearTimeout(timeoutFallback);
@@ -77,9 +72,7 @@ function App() {
     }
   }, []);
 
-  // ---------------------------------------------------------
-  // 3. UX: FAVICON & TÍTULO DINÁMICO
-  // ---------------------------------------------------------
+  // 3. UX: TÍTULO DINÁMICO
   useEffect(() => {
     const handleVisibilityChange = () => {
       const link = document.querySelector("link[rel~='icon']");
@@ -95,12 +88,9 @@ function App() {
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
-  // ---------------------------------------------------------
   // 4. SCROLL TO BOOKING
-  // ---------------------------------------------------------
   const handleTreatmentSelect = (treatmentName) => {
     setSelectedTreatment(treatmentName);
-    // Pequeño delay para permitir que el estado se actualice antes de scrollear
     setTimeout(() => {
       const bookingSection = document.getElementById('booking');
       if (bookingSection) {
@@ -112,23 +102,20 @@ function App() {
   return (
     <div className="relative min-h-screen font-sans selection:bg-purple-500/30 selection:text-purple-900">
 
-      {/* SPLASH SCREEN: Recibe el estado isLoading y maneja su propia salida */}
+      {/* SPLASH SCREEN */}
       <SplashScreen isLoading={isLoading} />
 
-      {/* FONDO: Estático y ligero (CSS puro) */}
+      {/* BACKGROUND ESTÁTICO (Optimizado) */}
       <BackgroundFlow />
 
-      {/* SPOTLIGHT: Solo se renderiza en PC para ahorrar batería en móvil */}
+      {/* SPOTLIGHT (Solo PC) */}
       {!isMobile && <MouseSpotlight />}
 
       {/* CONTENIDO PRINCIPAL */}
       <Navbar />
 
       <main>
-        {/* El Hero es crítico, se carga normal */}
         <Hero />
-
-        {/* El resto se carga bajo demanda (Lazy) */}
         <React.Suspense fallback={<div className="h-20 w-full" />}>
           <About />
           <Services onTreatmentSelect={handleTreatmentSelect} />
