@@ -1,10 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // Agregamos useEffect
 import { Smile, Sparkles, Syringe, Moon, Zap, User, ArrowUpRight, Sparkle, Activity, ScanFace } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ServiceModal from '../components/ServiceModal';
 
 // --- IMPORTACIÓN DE IMÁGENES ---
-// Asegúrate de que estas imágenes existan en tu carpeta src/assets/tratamientos/
 import imgBotox from '../assets/tratamientos/botox-full-face.webp';
 import imgHialuronico from '../assets/tratamientos/hialuronico.webp';
 import imgMeso from '../assets/tratamientos/mesoterapia.webp';
@@ -23,7 +22,7 @@ const facialAesthetics = [
     desc: "Relaja músculos del tercio superior para suavizar expresiones.",
     longDesc: "El tratamiento ideal para suavizar la expresión. Aplicamos toxina botulínica en tercio superior para relajar la musculatura, eliminando arrugas de frente, entrecejo y patas de gallo sin perder naturalidad.",
     steps: ["Evaluación mímica", "Diseño de puntos", "Aplicación (10 min)", "Control 15 días"],
-    image: imgBotox, // <--- Usamos la variable importada
+    image: imgBotox,
     icon: <Syringe size={24} />,
   },
   {
@@ -148,7 +147,8 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ 
       opacity: 1,
-      scale: isCenter ? 1 : 0.9,
+      // OPTIMIZACIÓN: Si es móvil, evitamos escalar para no confundir al usuario ni gastar GPU
+      scale: isCenter ? 1 : 0.95, 
     }}
     exit={{ opacity: 0, scale: 0.95 }}
     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -164,7 +164,7 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
                  transition-colors duration-300 shadow-md md:shadow-sm active:scale-[0.98] transition-transform"
 
     >
-      {/* SHIMMER EFFECT */}
+      {/* SHIMMER EFFECT - Optimizado: Solo visible en hover */}
       <div className="absolute inset-0 -translate-x-[150%] skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1s_ease-in-out]" />
 
       <div className="flex flex-col items-center mb-6 relative z-10">
@@ -215,30 +215,44 @@ const Services = ({ onTreatmentSelect = () => {} }) => {
 
   const scrollRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  
+  // 1. REF PARA THROTTLING (OPTIMIZACIÓN DE SCROLL)
+  const ticking = useRef(false);
 
   const displayServices = activeTab === 'facial' ? facialAesthetics : orthodontics;
 
+  // 2. FUNCIÓN DE SCROLL OPTIMIZADA CON rAF
   const handleScroll = () => {
-    if (scrollRef.current) {
-      const container = scrollRef.current;
-      const scrollLeft = container.scrollLeft;
-      const containerCenter = scrollLeft + (container.offsetWidth / 2);
-      
-      let closestIndex = 0;
-      let closestDistance = Infinity;
-      
-      Array.from(container.children).forEach((child, index) => {
-        if (index >= displayServices.length) return;
-        const cardCenter = child.offsetLeft + (child.offsetWidth / 2);
-        const distance = Math.abs(containerCenter - cardCenter);
-        
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
+    if (!ticking.current) {
+      window.requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          const container = scrollRef.current;
+          const scrollLeft = container.scrollLeft;
+          const containerCenter = scrollLeft + (container.offsetWidth / 2);
+          
+          let closestIndex = 0;
+          let closestDistance = Infinity;
+          
+          // Iteramos hijos directamente para evitar crear arrays gigantes en memoria
+          const children = container.children;
+          for (let i = 0; i < children.length; i++) {
+             // Evitamos leer hijos extraños (como espaciadores)
+             if (i >= displayServices.length) break;
+
+             const child = children[i];
+             const cardCenter = child.offsetLeft + (child.offsetWidth / 2);
+             const distance = Math.abs(containerCenter - cardCenter);
+             
+             if (distance < closestDistance) {
+               closestDistance = distance;
+               closestIndex = i;
+             }
+          }
+          setActiveIndex(closestIndex);
         }
+        ticking.current = false;
       });
-      
-      setActiveIndex(closestIndex);
+      ticking.current = true;
     }
   };
 
@@ -260,7 +274,8 @@ const Services = ({ onTreatmentSelect = () => {} }) => {
   return (
     <section id="services" className="relative py-12 md:py-24 overflow-hidden">
       
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+      {/* BACKGROUND BLUR ESTÁTICO (Optimizado para no moverse) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
       <div className="max-w-7xl mx-auto px-0 md:px-6 relative z-10">
         
@@ -312,6 +327,7 @@ const Services = ({ onTreatmentSelect = () => {} }) => {
                   pl-[calc((100vw-280px)/2)] pr-[calc((100vw-280px)/2)]
                   md:px-6 pb-8 md:pb-0 
                   hide-scrollbar
+                  scroll-smooth
                 "
               >
                 {displayServices.map((service, idx) => (

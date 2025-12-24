@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, CalendarCheck, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import consultorioHeader from '../assets/consultorio-hero.webp';
-
-
 
 const heroVariants = [
   {
     titleStart: "Sonrisas que",
-    highlight: "iluminan.", // Minúscula, continúa la frase
+    highlight: "iluminan.",
     titleEnd: "",
     description: "Ortodoncia de vanguardia y armonización orofacial. Resaltamos tus rasgos naturales con tratamientos mínimamente invasivos."
   },
@@ -17,18 +15,6 @@ const heroVariants = [
     highlight: "empieza acá.",
     titleEnd: "",
     description: "Diseñamos la sonrisa que siempre soñaste combinando tecnología digital con una visión estética integral."
-  },
-  {
-    titleStart: "Excelencia en",
-    highlight: "estética y salud.", // "&" cambiado por "y" (más formal/médico en español)
-    titleEnd: "",
-    description: "Un enfoque moderno donde la función perfecta se encuentra con la belleza natural de tu rostro."
-  },
-  {
-    titleStart: "El poder de",
-    highlight: "transformar", // Corregido: minúscula
-    titleEnd: "tu rostro.",
-    description: "Especialistas en alineadores invisibles y armonización. Descubrí tu mejor versión sin perder tu esencia."
   },
   {
     titleStart: "Resultados",
@@ -42,24 +28,58 @@ const allClientFaces = [
   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?fit=crop&w=100&h=100&q=80",
   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?fit=crop&w=100&h=100&q=80",
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fit=crop&w=100&h=100&q=80",
-  "https://images.unsplash.com/photo-1580489944761-15a19d654956?fit=crop&w=100&h=100&q=80"
 ];
 
 const Hero = () => {
-  // Inicialización Lazy para evitar saltos
+  // 1. DETECCIÓN DE MÓVIL
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 2. LÓGICA 3D TILT (SOLO PARA PC)
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Suavizado del movimiento del mouse (Spring physics)
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
+
+  // Transformamos posición del mouse en rotación (grados)
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
+
+  const handleMouseMove = (e) => {
+    if (isMobile) return; // En móvil no calculamos nada
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    if (isMobile) return;
+    x.set(0);
+    y.set(0);
+  };
+
+  // --- RESTO DE LÓGICA (TEXTOS, ETC) ---
   const [heroContent] = useState(() => {
     const randomIndex = Math.floor(Math.random() * heroVariants.length);
     return heroVariants[randomIndex];
   });
 
-  const [clientFaces] = useState(() => {
-    const shuffled = [...allClientFaces].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3);
-  });
-  
+  const [clientFaces] = useState(() => allClientFaces.slice(0, 3));
+
   const badges = ["Especialista U.B.A.", "Ortodoncia Invisible", "Armonización Facial"];
   const [index, setIndex] = useState(0);
 
@@ -72,72 +92,60 @@ const Hero = () => {
 
   return (
     <section id="home" className="relative w-full overflow-hidden flex flex-col justify-center h-[100dvh] lg:h-screen lg:min-h-[800px]">
-      
+
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full h-full lg:py-0">
-        
+
         {/* --- COLUMNA TEXTO --- */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }} 
-          animate={{ opacity: 1, y: 0 }}  
-          transition={{ duration: 0.8, ease: "easeOut" }} 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative z-10 flex flex-col h-full lg:h-auto justify-between lg:justify-center items-center lg:items-start text-center lg:text-left pt-28 pb-10 lg:py-0"
         >
-          
           {/* BADGE */}
           <div className="w-full flex justify-center lg:justify-start lg:mb-10 mb-2">
-            <motion.div 
-              layout 
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-slate-200 backdrop-blur-md shadow-sm"
-            >
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-slate-200 backdrop-blur-md shadow-sm">
               <div className="bg-primary/10 p-1 rounded-full text-primary flex-shrink-0">
                 <Sparkles size={14} fill="currentColor" />
               </div>
-              
-              <div className="relative flex items-center justify-start overflow-hidden h-5">
-                 <AnimatePresence mode='popLayout' initial={false}>
-                   <motion.span 
-                     key={index}
-                     initial={{ y: 20, opacity: 0, filter: 'blur(4px)' }}
-                     animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
-                     exit={{ y: -20, opacity: 0, filter: 'blur(4px)' }}
-                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                     className="text-slate-600 text-xs font-bold uppercase tracking-widest whitespace-nowrap block"
-                   >
-                     {badges[index]}
-                   </motion.span>
-                 </AnimatePresence>
+
+              <div className="relative flex items-center justify-start overflow-hidden h-5 w-[180px] md:w-auto">
+                <AnimatePresence mode='popLayout' initial={false}>
+                  <motion.span
+                    key={index}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="text-slate-600 text-xs font-bold uppercase tracking-widest whitespace-nowrap block absolute left-0 md:static"
+                  >
+                    {badges[index]}
+                  </motion.span>
+                </AnimatePresence>
               </div>
-            </motion.div>
+            </div>
           </div>
-          
-          {/* TÍTULO & DESCRIPCIÓN */}
+
+          {/* TÍTULO */}
           <div className="w-full flex flex-col items-center lg:items-start gap-6 lg:gap-8 justify-center flex-grow lg:flex-grow-0">
-            
-            {/* CAMBIO CLAVE EN TIPOGRAFÍA:
-                Mobile: text-4xl (Mucho más controlado y fino)
-                Tablet: sm:text-5xl
-                Desktop: lg:text-7xl (Impacto total)
-            */}
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-slate-800 leading-[1.1] tracking-tight text-balance">
               {heroContent.titleStart} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400 animate-pulse" style={{ animationDuration: '3s' }}>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
                 {heroContent.highlight}
               </span>
               {heroContent.titleEnd && (
-                <> <br className="hidden md:block"/> {heroContent.titleEnd}</>
+                <> <br className="hidden md:block" /> {heroContent.titleEnd}</>
               )}
             </h1>
-            
-            {/* REGLA DE 15PX APLICADA AQUÍ */}
+
             <p className="text-[15px] md:text-lg text-slate-500 max-w-lg leading-7 md:leading-relaxed font-light text-balance mx-auto lg:mx-0">
               {heroContent.description}
             </p>
-            
+
             {/* BOTONES */}
             <div className="flex flex-col w-full sm:w-auto sm:flex-row gap-4 pt-2 lg:pt-4">
-              <a 
-                href="#booking" 
+              <a
+                href="#booking"
                 className="
                   outline-none focus:outline-none
                   h-14 px-8 rounded-full w-full sm:w-auto
@@ -145,31 +153,31 @@ const Hero = () => {
                   bg-gradient-to-r from-violet-600 to-purple-500 text-white text-base font-medium tracking-wide
                   shadow-lg shadow-violet-500/30
                   transition-all duration-300
-                  hover:shadow-violet-500/50 hover:brightness-110
+                  hover:shadow-violet-500/50 hover:brightness-110 active:scale-95
                 "
               >
                 <CalendarCheck size={20} className="mr-2" />
                 Agendar Cita
               </a>
-              
-              <a 
-                href="#services" 
+
+              <a
+                href="#services"
                 className="
                   outline-none focus:outline-none
                   h-14 px-8 rounded-full w-full sm:w-auto
                   flex items-center justify-center 
                   bg-white border border-slate-200 text-slate-500 text-base font-medium
                   transition-all duration-300
-                  hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30
+                  hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 active:scale-95
                 "
               >
-                Ver Tratamientos 
-                <ChevronRight size={20} className="ml-1 transition-transform group-hover:translate-x-1" />
+                Ver Tratamientos
+                <ChevronRight size={20} className="ml-1" />
               </a>
             </div>
 
           </div>
-          
+
           {/* CLIENTES */}
           <div className="w-full flex justify-center lg:justify-start lg:mt-16">
             <div className="flex flex-col sm:flex-row items-center gap-3 text-sm text-slate-500 font-medium">
@@ -188,35 +196,52 @@ const Hero = () => {
 
         </motion.div>
 
-        {/* --- COLUMNA IMAGEN --- */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
+        {/* --- COLUMNA IMAGEN (HÍBRIDA: STATIC MOBILE / 3D PC) --- */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }} 
+          transition={{ duration: 0.8, delay: 0.1 }}
           className="hidden lg:flex relative w-full justify-center lg:justify-end lg:pl-10 items-center h-full"
+          style={{ perspective: 1000 }} // IMPORTANTE: Perspectiva para el 3D
         >
-          <div className="relative z-0 group perspective-1000 w-full max-w-xl aspect-[4/5]">
-            
-            <motion.div 
-              initial={{ x: 30, y: 30, rotate: 0 }}
-              animate={{ 
-                x: [30, 45, 30], 
+          {/* CONTENEDOR INTERACTIVO */}
+          <motion.div
+            className="relative z-0 group w-full max-w-xl aspect-[4/5]"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={!isMobile ? { rotateX, rotateY, transformStyle: "preserve-3d" } : {}} // Solo aplica 3D si NO es móvil
+          >
+
+            {/* BORDE FLOTANTE (Con efecto Parallax en PC) */}
+            <motion.div
+              animate={!isMobile ? {
+                x: [30, 45, 30],
                 y: [30, 50, 30],
-                rotate: [0, -2, 0] 
-              }}
+                rotate: [0, -2, 0]
+              } : {}}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full border-[2px] border-slate-300 rounded-[2.5rem] z-0 group-hover:border-violet-300 transition-colors duration-700 ease-out"
+              className="absolute inset-0 w-full h-full border-[2px] border-slate-300 rounded-[2.5rem] z-0 transition-colors duration-700 ease-out"
+              style={!isMobile ? { translateZ: -50 } : {}} // Profundidad 3D
             />
-            
-            <div className="relative z-10 w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 border-[10px] border-white ring-1 ring-slate-200 transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:-rotate-1 group-hover:shadow-primary/30">
-              <img 
-                src= {consultorioHeader}
-                alt="Dra. Viviana Marco Consultorio" 
-                className="w-full h-full object-cover"
+
+            {/* IMAGEN PRINCIPAL */}
+            <div
+              className="relative z-10 w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 border-[10px] border-white ring-1 ring-slate-200"
+              style={!isMobile ? { transform: "translateZ(20px)" } : {}} // La imagen "sale" hacia afuera en PC
+            >
+              <img
+                src={consultorioHeader}
+                alt="Dra. Viviana Marco Consultorio"
+                className="w-full h-full object-cover will-change-transform"
               />
-              <div className="absolute inset-0 -translate-x-[150%] skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1s_ease-in-out]" />
+
+              {/* BRILLO GLOSSY AL PASAR EL MOUSE (SOLO PC) */}
+              {!isMobile && (
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay" />
+              )}
             </div>
-          </div>
+
+          </motion.div>
         </motion.div>
 
       </div>

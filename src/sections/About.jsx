@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { GraduationCap, Award, Sparkles } from 'lucide-react';
-import vivianaFoto from '../assets/viviana-about.webp';
+import vivianaFoto from '../assets/viviana-about.webp'; // Asegurate que la ruta sea correcta
 
 const About = () => {
   const sectionRef = useRef(null);
@@ -12,8 +12,8 @@ const About = () => {
   });
 
   // PARALLAX: Movimiento lateral suave
-  const xViviana = useTransform(scrollYProgress, [0, 1], [0, -100]); // Se mueve levemente a la izquierda
-  const xMarco = useTransform(scrollYProgress, [0, 1], [0, 100]);    // Se mueve levemente a la derecha
+  const xViviana = useTransform(scrollYProgress, [0, 1], [0, -100]); 
+  const xMarco = useTransform(scrollYProgress, [0, 1], [0, 100]);    
 
   const credentials = [
     { 
@@ -37,10 +37,6 @@ const About = () => {
     <section id="about" ref={sectionRef} className="relative py-12 md:py-24 overflow-hidden">
       
       {/* --- BACKGROUND PARALLAX TEXT --- */}
-      {/* 1. Opacidad al 5% (text-slate-900/5) para que se vea SI O SI */}
-      {/* 2. Pegados a los bordes (left-0 y right-0) */}
-      {/* 3. Z-0 para que queden al fondo */}
-      
       <motion.div 
         style={{ x: xViviana }} 
         className="absolute top-0 left-0 pointer-events-none select-none z-0"
@@ -67,10 +63,13 @@ const About = () => {
           {/* --- 1. FOTO --- */}
           <div className="md:col-span-7 relative w-full flex justify-center md:block">
             <motion.div 
-              initial={{ clipPath: 'inset(10% 10% 10% 10%)', opacity: 0 }}
-              whileInView={{ clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              // FIX: CAMBIAMOS CLIP-PATH POR SCALE + Y
+              // Esto mantiene los bordes redondeados siempre visibles y perfectos
+              initial={{ opacity: 0, scale: 0.9, y: 50 }} 
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              
+              viewport={{ once: true, amount: 0.4 }} // Espera a que se vea el 40% de la foto
+              transition={{ duration: 0.8, ease: "easeOut" }} // Animación fluida de menos de 1 segundo
               
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 1.02 }}
