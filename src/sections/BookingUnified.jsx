@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MessageCircle, ArrowRight, Sparkles, ShieldCheck } from 'lucide-react';
+import { Calendar, MessageCircle, ArrowRight, Sparkles, ShieldCheck, Loader2 } from 'lucide-react';
 // Mantenemos framer-motion SOLO para la transición interna de pestañas y el form
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,6 +43,9 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
 // --- COMPONENTE PRINCIPAL ---
 const BookingUnified = ({ initialTreatment }) => {
   const [bookingMode, setBookingMode] = useState('whatsapp');
+
+  // Estado para controlar la carga del iframe del calendario
+  const [isIframeLoaded, setIsIframeLoaded] = useState(false);
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -90,7 +93,6 @@ const BookingUnified = ({ initialTreatment }) => {
 
         {/* HEADER CON ANIMACIÓN DIFERENTE */}
         <div className="text-center mb-12 space-y-6">
-          {/* CAMBIO: 'zoom-in' para dar énfasis al título */}
           <div
             data-aos="zoom-in"
             data-aos-duration="1000"
@@ -103,7 +105,6 @@ const BookingUnified = ({ initialTreatment }) => {
             </p>
           </div>
 
-          {/* CAMBIO: 'zoom-in' con delay para el botón switcher */}
           <div
             className="flex justify-center"
             data-aos="zoom-in"
@@ -114,8 +115,6 @@ const BookingUnified = ({ initialTreatment }) => {
         </div>
 
         {/* CONTENIDO PRINCIPAL */}
-        {/* CAMBIO: 'zoom-in-up' hace que el formulario crezca desde abajo hacia el usuario. 
-            Se siente más dinámico que un simple fade. */}
         <div
           className="min-h-[600px] relative"
           data-aos="zoom-in-up"
@@ -218,7 +217,7 @@ const BookingUnified = ({ initialTreatment }) => {
               </motion.div>
             )}
 
-            {/* OPCIÓN B: CALENDARIO (CALU) */}
+            {/* OPCIÓN B: CALENDARIO (CALU) - DISEÑO MEJORADO */}
             {bookingMode === 'calendar' && (
               <motion.div
                 key="calendar"
@@ -226,25 +225,52 @@ const BookingUnified = ({ initialTreatment }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}
-                className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl shadow-violet-900/5 overflow-hidden border border-slate-200 relative h-[750px] flex flex-col"
+                className="w-full bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl shadow-violet-900/5 overflow-hidden border border-slate-200 relative h-[750px] flex flex-col"
               >
-                {/* 1. BARRA DE AVISO SUPERIOR */}
-                <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-100 px-4 py-3 md:py-4 flex items-center justify-center gap-2 text-xs text-slate-500 font-medium text-center">
-                  <ShieldCheck size={14} className="text-violet-500 flex-shrink-0" />
-                  <span>Plataforma Médica Segura: Inicia sesión o regístrate para acceder a la agenda.</span>
+                {/* 1. BARRA DE AVISO SUPERIOR (DISEÑO MÁS LIMPIO) */}
+                <div className="bg-slate-50 border-b border-slate-100 px-6 py-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <ShieldCheck size={14} className="text-emerald-500" />
+                    <span>Conexión Segura SSL</span>
+                  </div>
+                  <div className="text-xs text-slate-400 font-medium">
+                    Powered by Calu
+                  </div>
                 </div>
 
-                {/* 2. LOADER */}
-                <div className="absolute inset-0 top-10 flex items-center justify-center bg-white -z-10">
-                  <div className="w-8 h-8 border-4 border-violet-100 border-t-violet-500 rounded-full animate-spin"></div>
-                </div>
+                {/* 2. LOADER ELEGANTE (SE OCULTA AL CARGAR EL IFRAME) */}
+                <AnimatePresence>
+                  {!isIframeLoaded && (
+                    <motion.div
+                      initial={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute inset-0 top-12 z-20 flex flex-col items-center justify-center bg-white"
+                    >
+                      {/* Icono Pulsante */}
+                      <div className="relative mb-4">
+                        <div className="absolute inset-0 bg-violet-100 rounded-full animate-ping opacity-50"></div>
+                        <div className="relative w-16 h-16 bg-violet-50 rounded-full flex items-center justify-center text-violet-600">
+                          <Calendar size={32} />
+                        </div>
+                      </div>
+
+                      {/* Texto de Carga */}
+                      <div className="flex items-center gap-2 text-slate-500 font-medium text-sm">
+                        <Loader2 size={16} className="animate-spin text-violet-500" />
+                        <span>Cargando disponibilidad...</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* 3. IFRAME OFICIAL */}
                 <iframe
                   src="https://citas.calu.app/coiconsultorio"
                   title="Agenda de Turnos Dra. Viviana Marco"
-                  className="w-full h-full border-none flex-grow bg-white"
+                  className={`w-full h-full border-none flex-grow bg-white transition-opacity duration-700 ${isIframeLoaded ? 'opacity-100' : 'opacity-0'}`}
                   loading="lazy"
+                  onLoad={() => setIsIframeLoaded(true)}
                 />
               </motion.div>
             )}

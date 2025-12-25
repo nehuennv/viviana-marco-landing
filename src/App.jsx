@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// --- COMPONENTES ---
+// --- COMPONENTES CORE ---
 import Navbar from './layout/Navbar';
 import Hero from './sections/Hero';
 import SplashScreen from './components/SplashScreen';
@@ -34,36 +34,24 @@ function App() {
     return () => media.removeEventListener('change', handler);
   }, []);
 
-  // 2. LÓGICA DE CARGA INTELIGENTE (TIEMPO MÍNIMO + CARGA REAL)
+  // 2. LÓGICA DE CARGA
   useEffect(() => {
     const handleLoad = async () => {
-
-      // A. Promesa de TIEMPO MÍNIMO (2.5 segundos)
-      // Esto asegura que la animación de la sonrisa (que tarda ~2s) se vea completa.
       const minTimePromise = new Promise(resolve => setTimeout(resolve, 2500));
-
-      // B. Promesa de CARGA DE RECURSOS
       const imagePromise = new Promise((resolve) => {
         const img = new Image();
         img.src = consultorioHero;
         img.onload = resolve;
-        img.onerror = resolve; // Si falla, seguimos igual
+        img.onerror = resolve;
       });
-
-      // C. Esperamos a que AMBAS terminen.
-      // Si la imagen carga rápido, esperamos al timer.
-      // Si la imagen tarda mucho, el timer termina pero esperamos a la imagen.
       await Promise.all([minTimePromise, imagePromise]);
-
       setIsLoading(false);
     };
 
-    // Verificamos carga
     if (document.readyState === 'complete') {
       handleLoad();
     } else {
       window.addEventListener('load', handleLoad);
-      // Fallback de seguridad (máximo 5s por si algo se traba)
       const timeoutFallback = setTimeout(() => setIsLoading(false), 5000);
       return () => {
         window.removeEventListener('load', handleLoad);
@@ -72,18 +60,42 @@ function App() {
     }
   }, []);
 
-  // 3. UX: TÍTULO DINÁMICO
+  // ---------------------------------------------------------
+  // 3. UX: SOLO TÍTULO DINÁMICO (Sin tocar Favicon)
+  // ---------------------------------------------------------
   useEffect(() => {
+    let lastIndex = -1;
+
     const handleVisibilityChange = () => {
-      const link = document.querySelector("link[rel~='icon']");
+      // Frases cortas con Emoji incluido
+      const exitTitles = [
+        "¡Te esperamos! 💜",
+        "No te vayas... 🥺",
+        "Tu sonrisa te espera ✨",
+        "Volvé pronto 👋",
+        "Dra. Viviana Marco 👩‍⚕️",
+        "¿Te olvidaste algo? 🤔",
+        "¡Agendá tu turno! 📅"
+      ];
+
       if (document.hidden) {
-        document.title = "✨ Estética & Ortodoncia te esperan...";
-        if (link) link.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👋</text></svg>";
+        // --- AL SALIR: ELEGIR FRASE ALEATORIA ---
+        let randomIndex;
+
+        // Evitamos repetir la misma frase dos veces seguidas
+        do {
+          randomIndex = Math.floor(Math.random() * exitTitles.length);
+        } while (randomIndex === lastIndex);
+
+        lastIndex = randomIndex;
+        document.title = exitTitles[randomIndex];
+
       } else {
+        // --- AL VOLVER: RESTAURAR TÍTULO ORIGINAL ---
         document.title = "Dra. Viviana Marco | Estética & Salud";
-        if (link) link.href = "/favicon.svg";
       }
     };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
@@ -102,16 +114,10 @@ function App() {
   return (
     <div className="relative min-h-screen font-sans selection:bg-purple-500/30 selection:text-purple-900">
 
-      {/* SPLASH SCREEN */}
       <SplashScreen isLoading={isLoading} />
-
-      {/* BACKGROUND ESTÁTICO (Optimizado) */}
       <BackgroundFlow />
-
-      {/* SPOTLIGHT (Solo PC) */}
       {!isMobile && <MouseSpotlight />}
 
-      {/* CONTENIDO PRINCIPAL */}
       <Navbar />
 
       <main>
