@@ -1,52 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { useMotionValue, useSpring, motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
 
 const MouseSpotlight = () => {
-  const [isDesktop, setIsDesktop] = useState(false);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    // Solo montamos la lógica si es una pantalla grande
-    const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, []);
+    const container = containerRef.current;
+    if (!container) return;
 
-  // Si no es desktop, retornamos null. CERO consumo de CPU.
-  if (!isDesktop) return null;
-
-  return <DesktopSpotlight />;
-};
-
-// Separamos la lógica en un componente interno para que los hooks no corran en vano
-const DesktopSpotlight = () => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springConfig = { damping: 25, stiffness: 150 };
-  const x = useSpring(mouseX, springConfig);
-  const y = useSpring(mouseY, springConfig);
-
-  useEffect(() => {
+    // Lógica optimizada (Direct DOM manipulation)
     const handleMouseMove = (e) => {
-      mouseX.set(e.clientX - 200);
-      mouseY.set(e.clientY - 200);
+      const { clientX, clientY } = e;
+      container.style.setProperty('--x', `${clientX}px`);
+      container.style.setProperty('--y', `${clientY}px`);
     };
+
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+  }, []);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none z-0"
+    <div
+      ref={containerRef}
+      // CAMBIO AQUÍ: 'z-0' en lugar de 'z-30'.
+      // Esto asegura que esté PEGADO al fondo, pero detrás del texto (que suele ser z-10).
+      className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-300"
       style={{
-        x, y,
-        background: 'radial-gradient(circle, rgba(162, 0, 255, 0.15) 0%, rgba(162, 0, 255, 0) 60%)',
-        mixBlendMode: 'multiply',
-        filter: 'blur(40px)',
+        background: `radial-gradient(
+          600px circle at var(--x) var(--y), 
+          rgba(124, 58, 237, 0.15), 
+          transparent 40%
+        )`,
+        '--x': '-1000px',
+        '--y': '-1000px',
       }}
-    />
+    >
+      {/* Textura de ruido (Noise) */}
+      <div
+        className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+    </div>
   );
-}
+};
 
 export default MouseSpotlight;

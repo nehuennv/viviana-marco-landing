@@ -146,20 +146,31 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
     transition={{ duration: 0.5, ease: "easeOut" }}
     className="min-w-[280px] w-[280px] md:min-w-0 md:w-[350px] snap-center h-full flex-shrink-0 md:!scale-100 md:!opacity-100"
   >
+
     <div
       onClick={() => onClick(service)}
-      className="group relative cursor-pointer rounded-[2rem] p-6 md:p-8 h-full flex flex-col overflow-hidden
-                 bg-gradient-to-br from-white via-violet-50/30 to-purple-50/20
-                 border border-violet-200/60 
-                 shadow-none
-                 
-                 md:bg-white
-                 md:border-slate-200 
-                 md:shadow-sm
-                 
-                 transition-all duration-300 active:scale-[0.98]
-                 md:hover:bg-white md:hover:border-violet-200 md:hover:shadow-2xl md:hover:shadow-violet-500/20 md:hover:scale-[1.02]
-                 "
+      className="
+          group relative cursor-pointer rounded-[2rem] p-6 md:p-8 h-full flex flex-col overflow-hidden
+          
+          /* ESTILOS BASE (Mobile) */
+          bg-gradient-to-br from-white via-violet-50/30 to-purple-50/20
+          border border-violet-200/60 
+          shadow-none
+          
+          /* ESTILOS DESKTOP (md:) */
+          md:bg-white
+          md:border-slate-200 
+          md:shadow-sm
+          
+          /* HOVER (Unificado y Sutil) */
+          transition-all duration-300 ease-out
+          active:scale-[0.98]
+          md:hover:bg-white 
+          md:hover:border-violet-200 
+          md:hover:shadow-xl md:hover:shadow-violet-500/10 
+          md:hover:-translate-y-1 
+          /* Nota: Quité 'scale-[1.02]' para que sea igual a reviews */
+        "
     >
       <div className="absolute inset-0 -translate-x-[150%] skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1s_ease-in-out]" />
 
@@ -262,14 +273,14 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
   };
 
   return (
-    <section id="services" className="relative pt-12 pb-0 md:py-32 overflow-hidden">
+    <section id="services" className="relative pt-12 pb-0 md:pt-32 md:pb-20 overflow-hidden">
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-200/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
       <div className="max-w-7xl mx-auto px-0 md:px-6 relative z-10">
 
         {/* --- HEADER --- */}
-        <div className="text-center mb-12 px-6">
+        <div className="text-center  px-6">
 
           {/* Badge con AOS */}
           <div
@@ -327,9 +338,10 @@ const Services = ({ onTreatmentSelect = () => { } }) => {
                   md:flex-wrap md:justify-center 
                   gap-4 md:gap-6
                   overflow-x-auto snap-x snap-mandatory 
+                  py-12
                   pl-[calc((100vw-280px)/2)] pr-[calc((100vw-280px)/2)]
                   md:px-6 
-                  pb-8 md:pb-0 
+                  pb-8 md:pb-12 
                   hide-scrollbar
                   scroll-smooth
                 "

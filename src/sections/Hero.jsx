@@ -5,23 +5,52 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useAn
 import consultorioHeader from '../assets/consultorio-hero.webp';
 
 const heroVariants = [
+  // --- 1. AUTORIDAD LOCAL (Perfil Profesional) ---
   {
-    titleStart: "Sonrisas que",
-    highlight: "iluminan.",
-    titleEnd: "",
-    description: "Ortodoncia de vanguardia y armonización orofacial. Resaltamos tus rasgos naturales con tratamientos mínimamente invasivos."
+    titleStart: "Especialista en",
+    highlight: "Ortodoncia & Estética.",
+    titleEnd: "", // Total: 4 palabras
+    description: "Atención exclusiva en Fotheringham 115, Neuquén. La Dra. Viviana Marco combina ciencia y arte para diseñar la sonrisa que merecés."
   },
+
+  // --- 2. ORTODONCIA INVISIBLE (Servicio Premium) ---
   {
-    titleStart: "Tu confianza",
-    highlight: "empieza acá.",
-    titleEnd: "",
-    description: "Diseñamos la sonrisa que siempre soñaste combinando tecnología digital con una visión estética integral."
+    titleStart: "Tu ortodoncia",
+    highlight: "100% invisible.",
+    titleEnd: "", // Total: 4 palabras
+    description: "Expertos en alineadores transparentes. Corregí tus dientes con la última tecnología digital, sin metales y con total comodidad."
   },
+
+  // --- 3. ARMONIZACIÓN (Enfoque Médico) ---
   {
-    titleStart: "Resultados",
-    highlight: "naturales.",
-    titleEnd: "",
-    description: "Dejá atrás la inseguridad al sonreír. Te acompañamos en el proceso de potenciar tu imagen con experiencia y calidez."
+    titleStart: "Armonización",
+    highlight: "Orofacial",
+    titleEnd: "Médica.", // Total: 3 palabras
+    description: "Rejuvenecimiento facial sutil con Botox y Hialurónico. Realzamos tus rasgos naturales respetando la anatomía de tu rostro."
+  },
+
+  // --- 4. TECNOLOGÍA DAMON (Eficiencia) ---
+  {
+    titleStart: "Sistema Damon",
+    highlight: "Autoligado.",
+    titleEnd: "", // Total: 3 palabras
+    description: "Tratamientos de ortodoncia avanzada de baja fricción. Lográ resultados más rápidos, higiénicos y con menos visitas al consultorio."
+  },
+
+  // --- 5. FILOSOFÍA (Confianza/Calidez) ---
+  {
+    titleStart: "Diseñamos",
+    highlight: "sonrisas únicas.",
+    titleEnd: "", // Total: 3 palabras
+    description: "No hacemos diseños genéricos. Estudiamos tu estructura facial para lograr una armonía perfecta que potencie tu belleza personal."
+  },
+
+  // --- 6. PROPUESTA DE VALOR (Seguridad) ---
+  {
+    titleStart: "Estética Facial y",
+    highlight: "Salud Integral.",
+    titleEnd: "", // Total: 4 palabras
+    description: "Un enfoque médico que prioriza tu bienestar. Recuperá la seguridad en tu imagen con tratamientos mínimamente invasivos y seguros."
   }
 ];
 
@@ -143,14 +172,21 @@ const Hero = ({ startAnimation }) => {
           animate={controls}   // Controlado por App.jsx (espera al Splash)
           variants={containerVariants}
         >
-          {/* BADGE */}
+          {/* BADGE MEJORADO */}
           <motion.div variants={itemVariants} className="w-full flex justify-center lg:justify-start lg:mb-10 mb-2">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-slate-200 backdrop-blur-md shadow-sm">
-              <div className="bg-primary/10 p-1 rounded-full text-primary flex-shrink-0">
+            {/* Agregamos 'layout' al contenedor padre para que se estire suavemente */}
+            <motion.div
+              layout
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-slate-200 backdrop-blur-md shadow-sm"
+            >
+              {/* El icono debe tener layout también para moverse suavemente si el ancho cambia */}
+              <motion.div layout className="bg-primary/10 p-1 rounded-full text-primary flex-shrink-0">
                 <Sparkles size={14} fill="currentColor" />
-              </div>
+              </motion.div>
 
-              <div className="relative flex items-center justify-start overflow-hidden h-5 w-[180px] md:w-auto">
+              {/* Quitamos anchos fijos y 'absolute'. Dejamos que el texto fluya. */}
+              <div className="relative flex items-center justify-center h-5 overflow-hidden min-w-[120px]">
                 <AnimatePresence mode='popLayout' initial={false}>
                   <motion.span
                     key={index}
@@ -158,13 +194,14 @@ const Hero = ({ startAnimation }) => {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -20, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="text-slate-600 text-xs font-bold uppercase tracking-widest whitespace-nowrap block absolute left-0 md:static"
+                    // IMPORTANTE: text-center para asegurar centrado visual
+                    className="text-slate-600 text-xs font-bold uppercase tracking-widest whitespace-nowrap block w-full text-center"
                   >
                     {badges[index]}
                   </motion.span>
                 </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* TÍTULO Y DESCRIPCIÓN */}
