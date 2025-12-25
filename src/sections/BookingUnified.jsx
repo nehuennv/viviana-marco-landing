@@ -147,7 +147,7 @@ const BookingUnified = ({ initialTreatment }) => {
                     <div>
                       <h3 className="text-xl font-bold text-slate-800 leading-tight">Asistente Virtual</h3>
                       <p className="text-slate-500 text-sm font-medium flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        {/* <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> */}
                         En línea ahora
                       </p>
                     </div>

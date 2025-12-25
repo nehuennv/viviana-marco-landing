@@ -6,35 +6,33 @@
   /* --- 1. GLOBAL SETTINGS & PERFORMANCE --- */
 
   :root {
+    /* ⚡ FUERZA ABSOLUTA DE MODO CLARO ⚡ */
     color-scheme: light;
-    /* FUERZA el modo claro. Evita bugs visuales en móviles. */
+    /* Esto le dice al navegador (Chrome/Safari) que NO invierta los colores */
   }
 
   html {
     font-size: 15px;
-    /* Móvil: texto sutilmente más compacto */
     -webkit-text-size-adjust: 100%;
-    /* Evita zoom automático indeseado en iOS */
-    /* scroll-behavior: smooth;  <-- ELIMINADO POR RENDIMIENTO (Causa lag con Framer Motion) */
+    /* Fix para móviles: Fondo blanco en el "rebote" del scroll */
+    background-color: #ffffff;
   }
 
   @media (min-width: 768px) {
     html {
       font-size: 16px;
-      /* PC: Tamaño estándar */
     }
   }
 
   body {
     font-family: 'Poppins', sans-serif;
+    /* Aseguramos texto oscuro y fondo blanco a fuego */
     @apply text-slate-800 antialiased bg-white;
     width: 100%;
     overflow-x: hidden;
-    /* Previene scroll lateral accidental */
   }
 
   /* --- 2. PREMIUM SCROLLBAR (OPTIMIZADO) --- */
-  /* CAMBIO CRÍTICO: Usamos 'html' y 'body' en vez de '*' para salvar CPU en móvil */
 
   html {
     scrollbar-width: thin;
@@ -53,7 +51,6 @@
     background-color: #c084fc;
     border-radius: 9999px;
     border: 4px solid white;
-    /* Truco visual para crear margen */
     background-clip: content-box;
   }
 
@@ -69,7 +66,6 @@
   textarea {
     @apply outline-none focus:outline-none;
     -webkit-tap-highlight-color: transparent;
-    /* Elimina el flash gris al tocar en Android/iOS */
   }
 }
 
@@ -78,19 +74,16 @@
   /* --- 4. UTILITIES --- */
   .hide-scrollbar {
     -ms-overflow-style: none;
-    /* IE y Edge */
     scrollbar-width: none;
-    /* Firefox */
   }
 
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari y Opera */
   }
 }
 
 /* --- 5. BROWSER FIXES (AUTOFILL) --- */
-/* Mantiene el fondo blanco cuando el navegador autocompleta formularios */
+/* Mantiene el fondo blanco cuando Chrome autocompleta formularios */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,

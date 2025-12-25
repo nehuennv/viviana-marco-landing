@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  // 🛑 BLINDAJE TAILWIND: Desactiva la detección automática del sistema
+  darkMode: 'class',
+
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,12 +10,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#7C3AED",       
-        secondary: "#DDD6FE",     
+        primary: "#7C3AED",
+        secondary: "#DDD6FE",
       },
       fontFamily: {
         // AHORA TODO ES POPPINS
-        sans: ['Poppins', 'sans-serif'], 
+        sans: ['Poppins', 'sans-serif'],
         heading: ['Poppins', 'sans-serif'],
       },
       boxShadow: {
@@ -23,6 +26,7 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
+    // DaisyUI también forzado a Light
     themes: ["light"],
   },
 }

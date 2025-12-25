@@ -37,13 +37,17 @@ function App() {
   // 2. LÓGICA DE CARGA
   useEffect(() => {
     const handleLoad = async () => {
+      // Tiempo mínimo de 2.5s para que se luzca la Splash Screen
       const minTimePromise = new Promise(resolve => setTimeout(resolve, 2500));
+
+      // Carga de la imagen principal
       const imagePromise = new Promise((resolve) => {
         const img = new Image();
         img.src = consultorioHero;
         img.onload = resolve;
         img.onerror = resolve;
       });
+
       await Promise.all([minTimePromise, imagePromise]);
       setIsLoading(false);
     };
@@ -61,7 +65,7 @@ function App() {
   }, []);
 
   // ---------------------------------------------------------
-  // 3. UX: SOLO TÍTULO DINÁMICO (Sin tocar Favicon)
+  // 3. UX: TÍTULO DINÁMICO (Sin tocar Favicon)
   // ---------------------------------------------------------
   useEffect(() => {
     let lastIndex = -1;
@@ -121,7 +125,9 @@ function App() {
       <Navbar />
 
       <main>
-        <Hero />
+        {/* HERO: Le pasamos la señal para que arranque cuando termine la carga */}
+        <Hero startAnimation={!isLoading} />
+
         <React.Suspense fallback={<div className="h-20 w-full" />}>
           <About />
           <Services onTreatmentSelect={handleTreatmentSelect} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, CalendarCheck, Sparkles } from 'lucide-react';
-// Mantenemos framer-motion SOLO para la física del Tilt en PC y el carrusel de texto pequeño
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+// IMPORTANTE: Agregamos 'useAnimation' para controlar manualmente la entrada
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useAnimation } from 'framer-motion';
 import consultorioHeader from '../assets/consultorio-hero.webp';
 
 const heroVariants = [
@@ -31,26 +31,37 @@ const allClientFaces = [
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2?fit=crop&w=100&h=100&q=80",
 ];
 
-const Hero = () => {
-  // 1. DETECCIÓN DE MÓVIL (Para desactivar Tilt 3D)
+// 1. RECIBIMOS LA PROP 'startAnimation' DESDE APP.JSX
+const Hero = ({ startAnimation }) => {
   const [isMobile, setIsMobile] = useState(true);
+
+  // Controls de Framer Motion para disparar la animación a voluntad
+  const controls = useAnimation();
+
+  // 2. EFECTO DE SINCRONIZACIÓN
+  useEffect(() => {
+    if (startAnimation) {
+      // Cuando termina el Splash (startAnimation = true), iniciamos la animación 'visible'
+      controls.start("visible");
+    } else {
+      // Mientras carga, mantenemos todo oculto
+      controls.start("hidden");
+    }
+  }, [startAnimation, controls]);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 1023px)');
     const updateMobile = (e) => setIsMobile(e.matches);
-
     setIsMobile(media.matches);
     media.addEventListener('change', updateMobile);
     return () => media.removeEventListener('change', updateMobile);
   }, []);
 
-  // 2. LÓGICA 3D TILT (SOLO PARA PC - USANDO MOTION VALUES PARA PERFORMANCE)
+  // --- LÓGICA 3D TILT ---
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-
   const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
   const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
-
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
 
@@ -75,11 +86,9 @@ const Hero = () => {
 
   // --- DATA ---
   const [heroContent] = useState(() => {
-    // Selección aleatoria solo al montar (SSR safe)
     const randomIndex = Math.floor(Math.random() * heroVariants.length);
     return heroVariants[randomIndex];
   });
-
   const [clientFaces] = useState(() => allClientFaces.slice(0, 3));
   const badges = ["Especialista U.B.A.", "Ortodoncia Invisible", "Armonización Facial"];
   const [index, setIndex] = useState(0);
@@ -91,22 +100,51 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // --- VARIANTES DE ANIMACIÓN (Entrada escalonada) ---
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15, // Retraso entre elementos
+        delayChildren: 0.2     // Pequeño respiro inicial
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 50, damping: 20 } // Movimiento suave y natural
+    }
+  };
+
+  // Variantes específicas para la imagen (entra desde la derecha)
+  const imageVariants = {
+    hidden: { x: 50, opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 40, damping: 20, delay: 0.4 }
+    }
+  };
+
   return (
     <section id="home" className="relative w-full overflow-hidden flex flex-col justify-center h-[100dvh] lg:h-screen lg:min-h-[800px]">
 
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full h-full lg:py-0">
 
-        {/* --- COLUMNA TEXTO --- */}
-        {/* REEMPLAZO FRAMER MOTION POR AOS */}
-        {/* data-aos-delay="600": Espera a que la Splash Screen empiece a irse */}
-        <div
-          data-aos="fade-up"
-          data-aos-duration="1000"
-          data-aos-delay="600"
+        {/* --- COLUMNA TEXTO (Animada por Framer Motion) --- */}
+        <motion.div
           className="relative z-10 flex flex-col h-full lg:h-auto justify-between lg:justify-center items-center lg:items-start text-center lg:text-left pt-28 pb-10 lg:py-0"
+          initial="hidden"     // Estado inicial
+          animate={controls}   // Controlado por App.jsx (espera al Splash)
+          variants={containerVariants}
         >
           {/* BADGE */}
-          <div className="w-full flex justify-center lg:justify-start lg:mb-10 mb-2">
+          <motion.div variants={itemVariants} className="w-full flex justify-center lg:justify-start lg:mb-10 mb-2">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-slate-200 backdrop-blur-md shadow-sm">
               <div className="bg-primary/10 p-1 rounded-full text-primary flex-shrink-0">
                 <Sparkles size={14} fill="currentColor" />
@@ -127,11 +165,11 @@ const Hero = () => {
                 </AnimatePresence>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* TÍTULO */}
+          {/* TÍTULO Y DESCRIPCIÓN */}
           <div className="w-full flex flex-col items-center lg:items-start gap-6 lg:gap-8 justify-center flex-grow lg:flex-grow-0">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-slate-800 leading-[1.1] tracking-tight text-balance">
+            <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl lg:text-7xl font-bold text-slate-800 leading-[1.1] tracking-tight text-balance">
               {heroContent.titleStart} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
                 {heroContent.highlight}
@@ -139,25 +177,17 @@ const Hero = () => {
               {heroContent.titleEnd && (
                 <> <br className="hidden md:block" /> {heroContent.titleEnd}</>
               )}
-            </h1>
+            </motion.h1>
 
-            <p className="text-[15px] md:text-lg text-slate-500 max-w-lg leading-7 md:leading-relaxed font-light text-balance mx-auto lg:mx-0">
+            <motion.p variants={itemVariants} className="text-[15px] md:text-lg text-slate-500 max-w-lg leading-7 md:leading-relaxed font-light text-balance mx-auto lg:mx-0">
               {heroContent.description}
-            </p>
+            </motion.p>
 
             {/* BOTONES */}
-            <div className="flex flex-col w-full sm:w-auto sm:flex-row gap-4 pt-2 lg:pt-4">
+            <motion.div variants={itemVariants} className="flex flex-col w-full sm:w-auto sm:flex-row gap-4 pt-2 lg:pt-4">
               <a
                 href="#booking"
-                className="
-                  outline-none focus:outline-none
-                  h-14 px-8 rounded-full w-full sm:w-auto
-                  flex items-center justify-center 
-                  bg-gradient-to-r from-violet-600 to-purple-500 text-white text-base font-medium tracking-wide
-                  shadow-lg shadow-violet-500/30
-                  transition-all duration-300
-                  hover:shadow-violet-500/50 hover:brightness-110 active:scale-95
-                "
+                className="outline-none focus:outline-none h-14 px-8 rounded-full w-full sm:w-auto flex items-center justify-center bg-gradient-to-r from-violet-600 to-purple-500 text-white text-base font-medium tracking-wide shadow-lg shadow-violet-500/30 transition-all duration-300 hover:shadow-violet-500/50 hover:brightness-110 active:scale-95"
               >
                 <CalendarCheck size={20} className="mr-2" />
                 Agendar Cita
@@ -165,24 +195,16 @@ const Hero = () => {
 
               <a
                 href="#services"
-                className="
-                  outline-none focus:outline-none
-                  h-14 px-8 rounded-full w-full sm:w-auto
-                  flex items-center justify-center 
-                  bg-white border border-slate-200 text-slate-500 text-base font-medium
-                  transition-all duration-300
-                  hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 active:scale-95
-                "
+                className="outline-none focus:outline-none h-14 px-8 rounded-full w-full sm:w-auto flex items-center justify-center bg-white border border-slate-200 text-slate-500 text-base font-medium transition-all duration-300 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 active:scale-95"
               >
                 Ver Tratamientos
                 <ChevronRight size={20} className="ml-1" />
               </a>
-            </div>
-
+            </motion.div>
           </div>
 
           {/* CLIENTES */}
-          <div className="w-full flex justify-center lg:justify-start lg:mt-16">
+          <motion.div variants={itemVariants} className="w-full flex justify-center lg:justify-start lg:mt-16">
             <div className="flex flex-col sm:flex-row items-center gap-3 text-sm text-slate-500 font-medium">
               <div className="flex -space-x-3">
                 {clientFaces.map((faceUrl, i) => (
@@ -195,20 +217,19 @@ const Hero = () => {
                 <span className="text-slate-900 font-bold">+1,500</span> pacientes felices
               </p>
             </div>
-          </div>
+          </motion.div>
 
-        </div>
+        </motion.div>
 
-        {/* --- COLUMNA IMAGEN --- */}
-        {/* AOS ENTRANCE: Se desliza desde la izquierda */}
-        <div
-          data-aos="fade-left"
-          data-aos-duration="1000"
-          data-aos-delay="800"
+        {/* --- COLUMNA IMAGEN (Con Tilt 3D + Animación de Entrada) --- */}
+        <motion.div
           className="hidden lg:flex relative w-full justify-center lg:justify-end lg:pl-10 items-center h-full"
           style={{ perspective: 1000 }}
+          initial="hidden"
+          animate={controls} // Sincronizado
+          variants={imageVariants} // Animación propia (desde la derecha)
         >
-          {/* CONTENEDOR INTERACTIVO 3D (SOLO PC) */}
+          {/* CONTENEDOR INTERACTIVO 3D */}
           <motion.div
             className="relative z-0 group w-full max-w-xl aspect-[4/5]"
             onMouseMove={handleMouseMove}
@@ -242,14 +263,14 @@ const Hero = () => {
                 className="w-full h-full object-cover will-change-transform"
               />
 
-              {/* BRILLO GLOSSY (SOLO PC) */}
+              {/* BRILLO GLOSSY */}
               {!isMobile && (
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay" />
               )}
             </div>
 
           </motion.div>
-        </div>
+        </motion.div>
 
       </div>
     </section>
