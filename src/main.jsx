@@ -1,16 +1,22 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; // IMPORTANTE
 import App from './App.jsx'
+import BookingPage from './pages/BookingPage.jsx';
 import './index.css'
 
-// --- IMPORTAR AOS (ANIMACIONES LIGERAS) ---
+// --- IMPORTAR AOS (ANIMACIONES) ---
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
+// --- FIX VANTRA SCROLL ---
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
 // Inicializar AOS
 AOS.init({
-  // Configuración Global
-  disable: false, // Puedes poner 'mobile' si quieres desactivarlas en celus muy viejos
+  disable: false,
   startEvent: 'DOMContentLoaded',
   initClassName: 'aos-init',
   animatedClassName: 'aos-animate',
@@ -18,19 +24,26 @@ AOS.init({
   disableMutationObserver: false,
   debounceDelay: 50,
   throttleDelay: 99,
-
-  // Settings de animación
-  offset: 80,          // Se activa un poco antes de llegar (px)
+  offset: 80,
   delay: 0,
-  duration: 800,       // Duración suave (800ms)
-  easing: 'ease-out-cubic', // Curva de velocidad elegante
-  once: true,          // IMPORTANTE: Solo anima una vez al bajar (ahorra recursos al subir)
+  duration: 800,
+  easing: 'ease-out-cubic',
+  once: true,
   mirror: false,
   anchorPlacement: 'top-bottom',
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    {/* 👇 ESTA ES LA LÍNEA MÁGICA QUE ARREGLA GITHUB PAGES 👇 */}
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <Routes>
+        {/* RUTA 1: La Landing Page Principal */}
+        <Route path="/" element={<App />} />
+
+        {/* RUTA 2: La Página Limpia de Turnos */}
+        <Route path="/turnos" element={<BookingPage />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
 )

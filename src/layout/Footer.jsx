@@ -1,6 +1,7 @@
 import React from 'react';
 import { Instagram, Facebook, ArrowUp, MapPin, Mail, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom'; // 👈 IMPORTANTE: Importamos Link
 
 const Footer = () => {
 
@@ -11,7 +12,7 @@ const Footer = () => {
   return (
     <footer className="relative bg-gradient-to-br from-slate-900 to-indigo-950 text-white pt-24 pb-8 rounded-t-[3rem] md:rounded-t-[5rem] overflow-hidden">
 
-      {/* 1. WATERMARK (FONDO INTACTO - SIN ANIMACIONES PARA NO ROMPERLO) */}
+      {/* 1. WATERMARK (FONDO) */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.02]">
         <h1 className="text-[15vw] font-bold font-heading leading-none tracking-tighter text-white whitespace-nowrap">
           VIVIANA MARCO
@@ -27,7 +28,7 @@ const Footer = () => {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-10 mb-16">
 
-          {/* TEXTO (Con animación suave solo aquí) */}
+          {/* TEXTO */}
           <div
             className="max-w-2xl text-center md:text-left md:pl-2"
             data-aos="fade-up"
@@ -43,7 +44,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* BOTÓN "SUBIR" - Oculto en móvil (hidden md:flex) */}
+          {/* BOTÓN "SUBIR" */}
           <div
             className="hidden md:block"
             data-aos="zoom-in"
@@ -72,10 +73,25 @@ const Footer = () => {
           >
             <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">Menu</h4>
             <ul className="space-y-4 font-medium">
-              <FooterLink href="#home">Inicio</FooterLink>
+              {/* Enlace Inicio usando Link para no recargar */}
+              <li>
+                <Link to="/" className="group flex items-center justify-between text-slate-300 hover:text-white transition-colors">
+                  <span>Inicio</span>
+                  <ArrowUp size={14} className="rotate-45 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-primary" />
+                </Link>
+              </li>
+
+              {/* Enlaces con ancla (Hash) - Mantenemos <a> para que funcione el scroll */}
               <FooterLink href="#services">Tratamientos</FooterLink>
               <FooterLink href="#about">Doctora</FooterLink>
-              <FooterLink href="#booking">Reservar</FooterLink>
+
+              {/* LINK A LA NUEVA PÁGINA CLEAN (USAMOS LINK) */}
+              <li>
+                <Link to="/turnos" className="group flex items-center justify-between text-slate-200 hover:text-white transition-colors font-semibold">
+                  <span>Agenda Full Screen</span>
+                  <ArrowUp size={14} className="rotate-45 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-primary" />
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -120,7 +136,7 @@ const Footer = () => {
               </div>
               <h3 className="text-2xl font-bold mb-1">Neuquén Capital</h3>
               <p className="text-slate-300 mb-4">Fotheringham 115</p>
-              <a href="https://www.google.com/maps/place/Dra+Viviana+Marco/@-38.9537869,-68.07154,17z/data=!3m1!4b1!4m6!3m5!1s0x960a33f5b82c7a9b:0x6dc30e7823932ffa!8m2!3d-38.9537911!4d-68.0689651!16s%2Fg%2F11mlhfkh1f?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" className="btn btn-sm bg-white/10 border-none text-white hover:bg-white hover:text-indigo-950 rounded-full px-6 backdrop-blur-md">
+              <a href="https://maps.app.goo.gl/TU_LINK_GOOGLE_MAPS" target="_blank" rel="noopener noreferrer" className="btn btn-sm bg-white/10 border-none text-white hover:bg-white hover:text-indigo-950 rounded-full px-6 backdrop-blur-md">
                 Abrir Mapa
               </a>
             </div>
@@ -137,7 +153,6 @@ const Footer = () => {
               href="https://vantradigital.com/"
               target="_blank"
               rel="noopener noreferrer"
-              // CAMBIO DE COLOR: Verde Lima (#E8EF41)
               className="text-[#E8EF41] hover:text-white transition-colors font-bold"
             >
               Vantra
@@ -150,7 +165,7 @@ const Footer = () => {
   );
 };
 
-// Micro-componentes (Sin cambios)
+// Micro-componentes
 const FooterLink = ({ href, children }) => (
   <li>
     <a href={href} className="group flex items-center justify-between text-slate-300 hover:text-white transition-colors">

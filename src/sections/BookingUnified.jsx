@@ -1,74 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Calendar, MessageCircle, ArrowRight, Sparkles,
-  ShieldCheck, Loader2, ChevronLeft, Search,
-  Smile, ClipboardList, Stethoscope, Clock
+  ShieldCheck, Loader2, Search, ChevronLeft,
+  Smile, ClipboardList, Stethoscope, Clock, Layers, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useBaserow } from '../hooks/useBaserow'; // Tu hook actualizado
+import { useBaserow } from '../hooks/useBaserow';
 
-// ... (MANTENER LA LISTA TREATMENT_CATEGORIES IGUAL QUE ANTES) ...
-// Para ahorrar espacio aquí no la repito, pero déjala tal cual la tenías
-const TREATMENT_CATEGORIES = [
-  // ... tus categorías ...
-  {
-    id: 'estetica',
-    label: 'Estética Facial',
-    icon: <Sparkles size={18} />,
-    color: 'text-purple-600 bg-purple-50 border-purple-100',
-    items: [
-      { title: 'Toxina Tercio Superior', slug: 'toxina-tercio-superior', time: '30m' },
-      { title: 'Control Toxina', slug: 'control-toxina', time: '15m' },
-      { title: 'Primera Consulta Estética', slug: 'primera-consulta-estetica', time: '35m' },
-    ]
-  },
-  // ... (copia el resto de categorías de tu archivo anterior)
-  {
-    id: 'ortodoncia',
-    label: 'Ortodoncia & Aparatología',
-    icon: <Smile size={18} />,
-    color: 'text-blue-600 bg-blue-50 border-blue-100',
-    items: [
-      { title: 'Control Ortodoncia', slug: 'control-ortodoncia', time: '20m' },
-      { title: 'Armado de Aparatología', slug: 'armado-de-aparatologia', time: '60m' },
-      { title: 'Recementado de Bracket', slug: 'recementado-de-bracket', time: '15m' },
-      { title: 'Entrega de Placa', slug: 'entrega-placa', time: '15m' },
-      { title: 'Retiro Aparatología Superior', slug: 'retiro-aparatologia-superior', time: '45m' },
-      { title: 'Retiro Aparatología Inferior', slug: 'retiro-aparatologia-inferior', time: '45m' },
-      { title: 'Retiro Ambos Maxilares', slug: 'retiro-ambos-maxilares', time: '90m' },
-      { title: 'Control Post Tratamiento', slug: 'control-post-tratamiento', time: '15m' },
-    ]
-  },
-  {
-    id: 'consultas',
-    label: 'Consultas & Obras Sociales',
-    icon: <ClipboardList size={18} />,
-    color: 'text-emerald-600 bg-emerald-50 border-emerald-100',
-    items: [
-      { title: 'Primera Consulta Particular', slug: 'primera-consulta-particular', time: '20m' },
-      { title: 'Primera Consulta ISSN', slug: 'primera-consulta-issn', time: '30m' },
-      { title: 'Recepción de Estudios', slug: 'recepcion-de-estudios', time: '15m' },
-      { title: 'Consulta General', slug: 'consulta-general', time: '20m' },
-      { title: 'Urgencia', slug: 'urgencia', time: '20m' },
-    ]
-  },
-  {
-    id: 'clinica',
-    label: 'Procedimientos Clínicos',
-    icon: <Stethoscope size={18} />,
-    color: 'text-slate-600 bg-slate-50 border-slate-200',
-    items: [
-      { title: 'Limpieza con Ultrasonido', slug: 'limpieza-con-ultrasonido', time: '30m' },
-      { title: 'Gingivectomía', slug: 'gingivectomia', time: '45m' },
-      { title: 'Protocolo Fotos y Cefalo', slug: 'protocolo-fotos-y-cefalo', time: '20m' },
-      { title: 'MIA (Microimplantes)', slug: 'mia', time: '30m' },
-      { title: 'Lury', slug: 'lury', time: '30m' },
-    ]
-  }
+// --- 1. UTILIDADES & CONFIGURACIÓN VISUAL ---
+const normalizeText = (text) => text.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+const smartSearch = (itemTitle, searchTerm) => {
+  if (!searchTerm) return true;
+  const cleanTitle = normalizeText(itemTitle);
+  const cleanSearch = normalizeText(searchTerm);
+  const searchTokens = cleanSearch.split(/\s+/).filter(t => t.length > 0);
+  return searchTokens.every(token => {
+    if (cleanTitle.includes(token)) return true;
+    if (token.length > 4 && token.endsWith('s')) {
+      const singularToken = token.slice(0, -1);
+      if (cleanTitle.includes(singularToken)) return true;
+    }
+    return false;
+  });
+};
+
+// Estilos de Categoría (Solo para el Calendario)
+const CATEGORY_UI = {
+  'Estética Facial': { icon: <Sparkles size={16} />, color: 'text-purple-600', activeClass: 'bg-purple-600 text-white shadow-purple-200' },
+  'Ortodoncia & Aparatología': { icon: <Smile size={16} />, color: 'text-blue-600', activeClass: 'bg-blue-600 text-white shadow-blue-200' },
+  'Consultas & Obras Sociales': { icon: <ClipboardList size={16} />, color: 'text-emerald-600', activeClass: 'bg-emerald-600 text-white shadow-emerald-200' },
+  'Procedimientos Clínicos': { icon: <Stethoscope size={16} />, color: 'text-slate-600', activeClass: 'bg-slate-700 text-white shadow-slate-200' },
+  'Otros': { icon: <Layers size={16} />, color: 'text-gray-500', activeClass: 'bg-gray-600 text-white shadow-gray-200' }
+};
+
+const CATEGORY_ORDER = [
+  'Todos',
+  'Estética Facial',
+  'Ortodoncia & Aparatología',
+  'Procedimientos Clínicos',
+  'Consultas & Obras Sociales',
+  'Otros'
 ];
 
 const CAL_BASE_URL = "https://cal.com/nehuen-5wgahb";
 
+// --- 2. SWITCH COMPONENT (Diseño Original) ---
 const LiquidSwitch = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'whatsapp', label: 'Asistente IA', icon: <Sparkles size={16} /> },
@@ -105,23 +82,24 @@ const LiquidSwitch = ({ activeTab, setActiveTab }) => {
   );
 };
 
+// --- 3. COMPONENTE PRINCIPAL ---
 const BookingUnified = ({ initialTreatment }) => {
   const [bookingMode, setBookingMode] = useState('whatsapp');
 
-  // IMPORTAMOS "isActive" DEL HOOK
-  const { getPrice, isActive, loading: loadingPrices } = useBaserow();
+  // Hook de Datos
+  const { treatmentsData, loading: loadingPrices } = useBaserow();
 
-  const [calendarStep, setCalendarStep] = useState('selection');
+  // Estados Calendario
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [calendarView, setCalendarView] = useState('grid'); // 'grid' | 'iframe'
   const [selectedUrl, setSelectedUrl] = useState(null);
   const [isIframeLoaded, setIsIframeLoaded] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    tratamiento: ''
-  });
+  // Formulario WhatsApp
+  const [formData, setFormData] = useState({ nombre: '', apellido: '', tratamiento: '' });
 
+  // Efecto: Preselección
   useEffect(() => {
     if (initialTreatment) {
       setFormData(prev => ({ ...prev, tratamiento: initialTreatment }));
@@ -129,24 +107,44 @@ const BookingUnified = ({ initialTreatment }) => {
     }
   }, [initialTreatment]);
 
-  const handleTreatmentSelect = (slug) => {
+  // --- LÓGICA DE FILTRADO ---
+  const filteredTreatments = useMemo(() => {
+    if (loadingPrices) return [];
+
+    let filtered = treatmentsData.filter(item => smartSearch(item.title, searchTerm) && item.active);
+
+    if (activeCategory !== 'Todos') {
+      filtered = filtered.filter(item => (item.category || 'Otros') === activeCategory);
+    }
+
+    return filtered;
+  }, [treatmentsData, searchTerm, activeCategory, loadingPrices]);
+
+  const categories = useMemo(() => {
+    const activeItems = treatmentsData.filter(t => t.active);
+    const availableCats = new Set(activeItems.map(t => t.category || 'Otros'));
+    return CATEGORY_ORDER.filter(cat => cat === 'Todos' || availableCats.has(cat));
+  }, [treatmentsData]);
+
+  // Handlers
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value.length > 0 && activeCategory !== 'Todos') setActiveCategory('Todos');
+  };
+
+  const handleSelectTreatment = (slug) => {
     setIsIframeLoaded(false);
     setSelectedUrl(`${CAL_BASE_URL}/${slug}?embed=true&theme=light`);
-    setCalendarStep('booking');
+    setCalendarView('iframe');
   };
 
-  const handleBack = () => {
-    setCalendarStep('selection');
+  const handleBackToGrid = () => {
+    setCalendarView('grid');
     setSelectedUrl(null);
-    setSearchTerm('');
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleWhatsAppSubmit = (e) => {
     e.preventDefault();
     const phoneNumber = "5492995977208";
     const message = `Hola Dra, soy ${formData.nombre} ${formData.apellido}. Me gustaría agendar un turno para: *${formData.tratamiento || "Consulta General"}*.`;
@@ -154,25 +152,18 @@ const BookingUnified = ({ initialTreatment }) => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Variantes para animación suave
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const itemVariants = { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } };
 
-  // --- FILTRADO INTELIGENTE (BÚSQUEDA + ESTADO ACTIVO) ---
-  const filteredCategories = TREATMENT_CATEGORIES.map(cat => ({
-    ...cat,
-    items: cat.items.filter(item => {
-      // 1. Filtro por buscador
-      const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
-      // 2. Filtro por Baserow (Si está inactivo, no pasa)
-      const isItemActive = isActive(item.slug);
-
-      return matchesSearch && isItemActive;
-    })
-  })).filter(cat => cat.items.length > 0);
-
   return (
     <section id="booking" className="relative py-12 md:pt-24 md:pb-20 z-10 overflow-visible">
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
 
         {/* HEADER */}
         <div className="text-center mb-12 space-y-6">
@@ -193,7 +184,7 @@ const BookingUnified = ({ initialTreatment }) => {
         <div className="min-h-[600px] relative" data-aos="zoom-in-up" data-aos-duration="800" data-aos-delay="300">
           <AnimatePresence mode="wait">
 
-            {/* --- WHATSAPP (SIN CAMBIOS) --- */}
+            {/* --- MODO A: WHATSAPP (ESTÉTICA ORIGINAL RESTAURADA) --- */}
             {bookingMode === 'whatsapp' && (
               <motion.div
                 key="whatsapp"
@@ -203,7 +194,6 @@ const BookingUnified = ({ initialTreatment }) => {
                 transition={{ duration: 0.4 }}
                 className="max-w-xl mx-auto"
               >
-                {/* ... (Todo tu código del form de whatsapp va acá igual que antes) ... */}
                 <div className="relative bg-white/60 backdrop-blur-md border border-slate-200 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-violet-900/5 transition-all duration-500">
                   <div className="flex items-center gap-5 mb-8">
                     <div className="relative group">
@@ -218,7 +208,7 @@ const BookingUnified = ({ initialTreatment }) => {
                     </div>
                   </div>
 
-                  <motion.form variants={containerVariants} initial="hidden" animate="visible" onSubmit={handleSubmit} className="space-y-6">
+                  <motion.form variants={containerVariants} initial="hidden" animate="visible" onSubmit={handleWhatsAppSubmit} className="space-y-6">
                     <motion.div variants={itemVariants} className="space-y-2">
                       <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Tus Datos</label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -231,15 +221,15 @@ const BookingUnified = ({ initialTreatment }) => {
                       <div className="relative">
                         <select name="tratamiento" value={formData.tratamiento} onChange={handleChange} className="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-base font-medium text-slate-700 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all shadow-sm appearance-none cursor-pointer">
                           <option value="" disabled>Seleccioná el tratamiento...</option>
-                          <option value="Botox Full Face">Botox Full Face</option>
-                          <option value="Labios & Hialurónico">Labios & Hialurónico</option>
-                          <option value="Mesoterapia">Mesoterapia</option>
-                          <option value="Bioestimulación Colágeno">Bioestimulación Colágeno</option>
-                          <option value="Bruxismo con Botox">Bruxismo con Botox</option>
-                          <option value="Alineadores Invisibles">Alineadores Invisibles</option>
-                          <option value="Brackets Autoligado">Brackets Autoligado</option>
-                          <option value="Placas de Ronquidos">Placas de Ronquidos</option>
                           <option value="Consulta General">Consulta General</option>
+                          {/* Opciones dinámicas para el select de WA también */}
+                          {treatmentsData.length > 0 && (
+                            <optgroup label="Disponibles">
+                              {treatmentsData.filter(t => t.active).map(t => (
+                                <option key={t.slug} value={t.title}>{t.title}</option>
+                              ))}
+                            </optgroup>
+                          )}
                         </select>
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg></div>
                       </div>
@@ -255,7 +245,7 @@ const BookingUnified = ({ initialTreatment }) => {
               </motion.div>
             )}
 
-            {/* --- CALENDARIO (REDISEÑADO) --- */}
+            {/* --- MODO B: CALENDARIO (DISEÑO INFINITY PERO ADAPTADO) --- */}
             {bookingMode === 'calendar' && (
               <motion.div
                 key="calendar"
@@ -263,158 +253,142 @@ const BookingUnified = ({ initialTreatment }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}
-                className="w-full max-w-4xl mx-auto bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl shadow-violet-900/5 overflow-hidden border border-slate-200 relative h-[750px] flex flex-col"
+                className="w-full max-w-5xl mx-auto"
               >
-                {/* Header Calendario */}
-                <div className="bg-white/90 backdrop-blur border-b border-slate-100 px-6 py-4 flex items-center justify-between z-20 shrink-0">
-                  <div className="flex items-center gap-2">
-                    {calendarStep === 'booking' ? (
-                      <button
-                        onClick={handleBack}
-                        className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-violet-600 transition-colors px-3 py-1.5 hover:bg-slate-50 rounded-lg"
-                      >
-                        <ChevronLeft size={18} /> Atrás
+                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-violet-900/5 border border-slate-200 overflow-hidden min-h-[750px] flex flex-col relative">
+
+                  {/* HEADER INTERNO */}
+                  <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white/90 backdrop-blur sticky top-0 z-20">
+                    {calendarView === 'iframe' ? (
+                      <button onClick={handleBackToGrid} className="flex items-center gap-2 text-slate-500 hover:text-violet-600 transition-colors group px-2 py-1 rounded-lg hover:bg-slate-50">
+                        <ChevronLeft size={18} />
+                        <span className="text-sm font-bold">Volver a tratamientos</span>
                       </button>
                     ) : (
-                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
+                      <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse"></span>
-                        Seleccioná tratamiento
+                        <span className="text-sm font-bold text-slate-700">Seleccioná tu tratamiento</span>
                       </div>
                     )}
+                    <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                      <ShieldCheck size={14} /> <span>TURNOS VERIFICADOS</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                    <ShieldCheck size={14} className="text-emerald-500" />
-                    <span className="hidden sm:inline">Turnos verificados</span>
-                  </div>
-                </div>
 
-                <div className="flex-grow relative bg-slate-50 overflow-hidden">
-                  <AnimatePresence mode="wait">
+                  {/* CONTENIDO DINÁMICO */}
+                  <div className="flex-grow relative bg-slate-50/50">
+                    <AnimatePresence mode="wait">
 
-                    {/* PASO 1: LISTA FILTRABLE */}
-                    {calendarStep === 'selection' && (
-                      <motion.div
-                        key="step-selection"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute inset-0 flex flex-col"
-                      >
-                        {/* Buscador */}
-                        <div className="p-6 pb-2 bg-white/50 backdrop-blur-sm sticky top-0 z-10">
-                          <div className="relative max-w-lg mx-auto">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input
-                              type="text"
-                              placeholder="Buscar tratamiento (ej: Limpieza, Toxina...)"
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                              className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-50 transition-all shadow-sm"
-                            />
-                          </div>
-                        </div>
-
-                        {/* LISTA CON TARJETAS REDISEÑADAS */}
-                        <div className="overflow-y-auto custom-scrollbar p-6 space-y-8 flex-grow">
-                          {filteredCategories.length > 0 ? (
-                            filteredCategories.map((cat) => (
-                              <div key={cat.id} className="max-w-3xl mx-auto">
-                                <div className={`flex items-center gap-2 mb-4 px-2 py-1.5 rounded-lg w-fit ${cat.color} bg-opacity-30`}>
-                                  {cat.icon}
-                                  <h4 className={`text-sm font-bold uppercase tracking-wider`}>
-                                    {cat.label}
-                                  </h4>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                  {cat.items.map((item, idx) => (
-                                    <button
-                                      key={idx}
-                                      onClick={() => handleTreatmentSelect(item.slug)}
-                                      className="group flex flex-col justify-between p-5 rounded-2xl border border-slate-200 bg-white hover:border-violet-300 hover:shadow-xl hover:shadow-violet-500/10 transition-all duration-300 text-left relative overflow-hidden h-full min-h-[110px]"
-                                    >
-                                      {/* Título arriba */}
-                                      <div className="relative z-10 mb-4">
-                                        <span className="text-[15px] font-bold text-slate-700 group-hover:text-violet-700 leading-snug block">
-                                          {item.title}
-                                        </span>
-                                      </div>
-
-                                      {/* Footer: Precio y Duración separados */}
-                                      <div className="relative z-10 flex items-end justify-between w-full mt-auto border-t border-slate-100 pt-3">
-                                        {/* PRECIO (Destacado) */}
-                                        {loadingPrices ? (
-                                          <div className="h-5 w-16 bg-slate-100 rounded animate-pulse" />
-                                        ) : (
-                                          getPrice(item.slug) ? (
-                                            <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100 shadow-sm">
-                                              {getPrice(item.slug)}
-                                            </span>
-                                          ) : (
-                                            <span className="text-xs text-slate-400 font-medium italic">Consultar</span>
-                                          )
-                                        )}
-
-                                        {/* DURACIÓN (Sutil) */}
-                                        <div className="flex items-center gap-1 text-xs font-semibold text-slate-400 group-hover:text-violet-500 transition-colors">
-                                          <Clock size={12} strokeWidth={2.5} />
-                                          {item.time}
-                                        </div>
-                                      </div>
-
-                                      {/* Gradiente sutil en hover */}
-                                      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-violet-50/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                    </button>
-                                  ))}
-                                </div>
+                      {/* VISTA GRID (Pills + Cards Nuevas) */}
+                      {calendarView === 'grid' && (
+                        <motion.div
+                          key="grid"
+                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+                          className="absolute inset-0 flex flex-col"
+                        >
+                          {/* Filtros Container */}
+                          <div className="p-6 pb-2 space-y-5 bg-white/50 backdrop-blur-sm z-10">
+                            {/* Buscador Clean */}
+                            <div className="relative group max-w-lg mx-auto">
+                              <div className="relative flex items-center bg-white rounded-xl border border-slate-200 shadow-sm group-hover:border-violet-300 transition-all focus-within:ring-2 focus-within:ring-violet-100">
+                                <Search className="ml-4 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={18} />
+                                <input
+                                  type="text" placeholder="Buscar (ej: Botox, Limpieza...)"
+                                  value={searchTerm} onChange={handleSearchChange}
+                                  className="w-full h-12 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 px-3 text-sm font-medium"
+                                />
                               </div>
-                            ))
-                          ) : (
-                            <div className="text-center py-10 text-slate-400">
-                              <p>No encontramos tratamientos disponibles.</p>
+                            </div>
+                            {/* Pills de Categorías */}
+                            <div className="flex flex-wrap justify-center gap-2">
+                              {categories.map(cat => {
+                                const isActive = activeCategory === cat;
+                                const ui = CATEGORY_UI[cat] || CATEGORY_UI['Otros'];
+                                return (
+                                  <button
+                                    key={cat} onClick={() => { setActiveCategory(cat); setSearchTerm(''); }}
+                                    className={`
+                                                         px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border flex items-center gap-1.5
+                                                         ${isActive ? ui.activeClass + ' shadow-md scale-105' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'}
+                                                      `}
+                                  >
+                                    {cat !== 'Todos' && <span className={isActive ? 'text-white' : ui.color}>{ui.icon}</span>}
+                                    {cat}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Grid Scrollable */}
+                          <div className="flex-grow overflow-y-auto px-6 pb-8 custom-scrollbar">
+                            {loadingPrices ? (
+                              <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                                <Loader2 className="animate-spin mb-2 text-violet-500" size={32} />
+                                <p className="text-xs font-medium">Cargando...</p>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                                {filteredTreatments.map((item) => (
+                                  <button
+                                    key={item.slug} onClick={() => handleSelectTreatment(item.slug)}
+                                    className="group bg-white p-5 rounded-2xl border border-slate-200 hover:border-violet-300 shadow-sm hover:shadow-xl hover:shadow-violet-500/10 transition-all duration-300 text-left flex flex-col h-full relative overflow-hidden"
+                                  >
+                                    <div className="mb-3 relative z-10">
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 text-[10px] font-bold uppercase text-slate-400 border border-slate-100 group-hover:text-violet-600 group-hover:bg-violet-50 transition-colors">
+                                        {CATEGORY_UI[item.category]?.icon} {item.category}
+                                      </span>
+                                    </div>
+                                    <div className="flex-grow relative z-10">
+                                      <h4 className="text-[15px] font-bold text-slate-700 group-hover:text-violet-700 transition-colors mb-1 leading-snug">{item.title}</h4>
+                                      <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium"><Clock size={10} /> {item.duration}</div>
+                                    </div>
+                                    <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between w-full relative z-10">
+                                      <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                                        {`$${Number(item.price).toLocaleString('es-AR')}`}
+                                      </span>
+                                      <ArrowRight size={16} className="text-slate-300 group-hover:text-violet-600 transition-colors -rotate-45 group-hover:rotate-0 transform duration-300" />
+                                    </div>
+                                    {/* Glow sutil en hover */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-violet-50/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                  </button>
+                                ))}
+                                {filteredTreatments.length === 0 && (
+                                  <div className="col-span-full text-center py-10 text-slate-400 text-sm">
+                                    No encontramos tratamientos.
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* VISTA IFRAME (Dentro del contenedor, sin modal externo) */}
+                      {calendarView === 'iframe' && (
+                        <motion.div
+                          key="iframe"
+                          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}
+                          className="absolute inset-0 bg-white flex flex-col"
+                        >
+                          {!isIframeLoaded && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 z-0">
+                              <Loader2 className="animate-spin text-violet-500 mb-3" size={32} />
+                              <p className="text-xs text-slate-400 font-medium animate-pulse">Conectando con la agenda...</p>
                             </div>
                           )}
-                          <div className="h-10"></div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* PASO 2: IFRAME CAL.COM */}
-                    {calendarStep === 'booking' && (
-                      <motion.div
-                        key="step-booking"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 w-full h-full bg-white"
-                      >
-                        <AnimatePresence>
-                          {!isIframeLoaded && (
-                            <motion.div
-                              initial={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white"
-                            >
-                              <Loader2 size={32} className="animate-spin text-violet-600 mb-3" />
-                              <span className="text-sm font-medium text-slate-500">Conectando con la agenda...</span>
-                            </motion.div>
+                          {selectedUrl && (
+                            <iframe
+                              src={selectedUrl}
+                              className={`w-full h-full border-none relative z-10 transition-opacity duration-500 ${isIframeLoaded ? 'opacity-100' : 'opacity-0'}`}
+                              onLoad={() => setIsIframeLoaded(true)}
+                              allow="camera; microphone; autoplay; fullscreen"
+                            />
                           )}
-                        </AnimatePresence>
-
-                        {selectedUrl && (
-                          <iframe
-                            src={selectedUrl}
-                            title="Agenda"
-                            className={`w-full h-full border-none transition-opacity duration-500 ${isIframeLoaded ? 'opacity-100' : 'opacity-0'}`}
-                            loading="lazy"
-                            onLoad={() => setIsIframeLoaded(true)}
-                            allow="camera; microphone; autoplay; fullscreen"
-                          />
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </motion.div>
             )}

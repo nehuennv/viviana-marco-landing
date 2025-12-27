@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ⚠️ TU CONFIGURACIÓN REAL
-// 1. TOKEN: Créalo en Baserow -> Settings -> Database Tokens
 const BASEROW_TOKEN = 'RGLLjgYjrFUZnUTEoq5eu89cicbbAlj6';
-
-// 2. ID DE TABLA: Extraído de tu link (baserow.io/.../table/783181/...)
 const TABLE_ID = '783181';
 
 export function useBaserow() {
@@ -16,25 +13,37 @@ export function useBaserow() {
             try {
                 const response = await fetch(
                     `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/?user_field_names=true&size=200`,
-                    { headers: { Authorization: `Token ${BASEROW_TOKEN}` } }
+                    {
+                        headers: {
+                            Authorization: `Token ${BASEROW_TOKEN}`,
+                        },
+                    }
                 );
+
                 if (!response.ok) throw new Error(`Error Baserow: ${response.status}`);
+
                 const data = await response.json();
 
+                // Mapeamos TODO desde la base de datos
+                // Asegúrate que las columnas en Baserow se llamen:
+                // "Nombre", "Slug", "Precio", "Duracion", "Categoria", "Activo"
                 const formatted = data.results.map((item) => ({
+                    title: item.Nombre,       // Título real (ej: "Botox")
                     slug: item.Slug,
                     price: item.Precio,
-                    duration: item.Duracion,
-                    active: item.Activo // Leemos el Checkbox de Baserow
+                    duration: item.Duracion,  // (ej: "30m")
+                    category: item.Categoria?.value || 'Otros', // Leemos el valor del Single Select
+                    active: item.Activo
                 }));
 
                 setTreatmentsData(formatted);
             } catch (error) {
-                console.error("Error cargando precios:", error);
+                console.error("Error cargando tratamientos:", error);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchPrices();
     }, []);
 
@@ -45,18 +54,13 @@ export function useBaserow() {
         return `$${Number(found.price).toLocaleString('es-AR')}`;
     };
 
-    // NUEVO: Función para saber si mostramos o no el tratamiento
     const isActive = (slug) => {
-        // Si todavía está cargando, asumimos que SI está activo (para no que no parpadee vacío)
         if (loading) return true;
-
         const found = treatmentsData.find(t => t.slug === slug);
-        // Si no está en la base de datos, lo mostramos por defecto (o false si prefieres estricto)
         if (!found) return true;
-
-        // Devolvemos el valor del checkbox
         return found.active;
     };
 
-    return { getPrice, isActive, loading };
+    // NUEVO: Exportamos la data cruda para poder agruparla en el componente
+    return { treatmentsData, getPrice, isActive, loading };
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react'; // IMPORTANTE: Agregado useLayoutEffect
 
 // --- COMPONENTES CORE ---
 import Navbar from './layout/Navbar';
@@ -63,6 +63,14 @@ function App() {
       };
     }
   }, []);
+
+  // --- FIX VANTRA PARTE 2: SCROLL RESET ---
+  // Usamos useLayoutEffect para asegurar que el scroll esté en 0 antes de pintar el frame.
+  useLayoutEffect(() => {
+    if (!isLoading) {
+      window.scrollTo(0, 0);
+    }
+  }, [isLoading]);
 
   // ---------------------------------------------------------
   // 3. UX: TÍTULO DINÁMICO (Sin tocar Favicon)
