@@ -6,45 +6,32 @@
   /* --- 1. GLOBAL SETTINGS & PERFORMANCE --- */
 
   :root {
-    /* ⚡ FUERZA ABSOLUTA DE MODO CLARO ⚡ */
     color-scheme: light;
-    /* Esto le dice al navegador (Chrome/Safari) que NO invierta los colores */
   }
 
   html {
-    font-size: 15px;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  @media (min-width: 768px) {
-    html {
-      font-size: 16px;
-    }
-  }
-
-  /* 🛡️ BLINDAJE VISUAL & ESTABILIDAD 🛡️ */
-  html {
-    background-color: #ffffff !important;
-    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    /* Prevents accidental horizontal scroll */
+    scroll-behavior: smooth;
+    /* Native smooth scrolling */
   }
 
   body {
-    background-color: transparent !important;
-    background-image: none !important;
+    /* KEY FIX: Use min-height instead of fixed height to allow natural flow */
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
+
+    /* KEY FIX: Reset backgrounds to solid to prevent Safari compositing bugs */
+    background-color: #ffffff !important;
     color: #0f172a !important;
     /* Slate-900 */
 
-    /* ESTABILIDAD DE SCROLL (Anti-Rebote) */
-    height: 100dvh;
-    overscroll-behavior-y: none;
-    scrollbar-gutter: stable;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  body {
     font-family: 'Poppins', sans-serif;
-    @apply antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* --- 2. PREMIUM SCROLLBAR (OPTIMIZADO) --- */
