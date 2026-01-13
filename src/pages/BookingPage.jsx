@@ -1,62 +1,21 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Search, ChevronLeft, ArrowRight, X,
-    Sparkles, Smile, ClipboardList, Stethoscope, Layers,
-    Clock, Loader2
+    Sparkles, Smile, ArrowRight, X, ChevronLeft, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useBaserow } from '../hooks/useBaserow';
 
-// --- UTILIDADES ---
-const normalizeText = (text) => text.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-
-const smartSearch = (itemTitle, searchTerm) => {
-    if (!searchTerm) return true;
-    const cleanTitle = normalizeText(itemTitle);
-    const cleanSearch = normalizeText(searchTerm);
-    const searchTokens = cleanSearch.split(/\s+/).filter(t => t.length > 0);
-    return searchTokens.every(token => {
-        if (cleanTitle.includes(token)) return true;
-        if (token.length > 4 && token.endsWith('s')) {
-            const singularToken = token.slice(0, -1);
-            if (cleanTitle.includes(singularToken)) return true;
-        }
-        return false;
-    });
-};
-
-// --- CONFIGURACIÓN UI ---
-const CATEGORY_UI = {
-    'Estética Facial': { icon: <Sparkles size={16} />, color: 'text-purple-600', activeClass: 'bg-purple-600 border-purple-600 text-white' },
-    'Ortodoncia & Aparatología': { icon: <Smile size={16} />, color: 'text-blue-600', activeClass: 'bg-blue-600 border-blue-600 text-white' },
-    'Consultas & Obras Sociales': { icon: <ClipboardList size={16} />, color: 'text-emerald-600', activeClass: 'bg-emerald-600 border-emerald-600 text-white' },
-    'Procedimientos Clínicos': { icon: <Stethoscope size={16} />, color: 'text-slate-600', activeClass: 'bg-slate-700 border-slate-700 text-white' },
-    'Otros': { icon: <Layers size={16} />, color: 'text-gray-500', activeClass: 'bg-gray-600 border-gray-600 text-white' }
-};
-
-const CATEGORY_ORDER = [
-    'Todos',
-    'Estética Facial',
-    'Ortodoncia & Aparatología',
-    'Procedimientos Clínicos',
-    'Consultas & Obras Sociales',
-    'Otros'
-];
-
-const CAL_BASE_URL = "https://cal.com/nehuen-5wgahb";
+const CAL_BASE_URL = "https://cal.com/dra-viviana-marco-demo";
 
 export default function BookingPage() {
-    const { treatmentsData, loading: loadingPrices } = useBaserow();
-
-    const [selectedUrl, setSelectedUrl] = useState(null);
+    const { treatmentsData, loading } = useBaserow();
+    const [selectedSlug, setSelectedSlug] = useState(null);
     const [isIframeLoaded, setIsIframeLoaded] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeCategory, setActiveCategory] = useState('Todos');
-
-    // Header Scroll Effect
+    const [hoveredCard, setHoveredCard] = useState(null);
     const [isScrolled, setIsScrolled] = useState(false);
 
+    // Scroll Effect for Navbar
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
@@ -65,65 +24,77 @@ export default function BookingPage() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // --- FILTROS ---
-    const filteredTreatments = useMemo(() => {
-        if (loadingPrices) return [];
-        let filtered = treatmentsData.filter(item => smartSearch(item.title, searchTerm) && item.active);
-        if (activeCategory !== 'Todos') {
-            filtered = filtered.filter(item => (item.category || 'Otros') === activeCategory);
-        }
-        return filtered;
-    }, [treatmentsData, searchTerm, activeCategory, loadingPrices]);
-
-    const categories = useMemo(() => {
-        const activeItems = treatmentsData.filter(t => t.active);
-        const availableCats = new Set(activeItems.map(t => t.category || 'Otros'));
-        return CATEGORY_ORDER.filter(cat => cat === 'Todos' || availableCats.has(cat));
-    }, [treatmentsData]);
-
-    const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setSearchTerm(value);
-        if (value.length > 0 && activeCategory !== 'Todos') {
-            setActiveCategory('Todos');
-        }
+    // Helper para obtener precio dinámico
+    const getPrice = (targetSlug) => {
+        if (loading) return null;
+        const item = treatmentsData.find(t => t.slug === targetSlug);
+        return item ? Number(item.price).toLocaleString('es-AR') : null;
     };
 
     const handleSelect = (slug) => {
         setIsIframeLoaded(false);
-        setSelectedUrl(`${CAL_BASE_URL}/${slug}?embed=true&theme=light`);
+        setSelectedSlug(slug);
     };
 
+    // Configuración de las 2 Tarjetas "Hero" (Consistente con la Sección)
+    const PORTALS = [
+        {
+            id: 'estetica',
+            slug: 'primera-consulta-estetica',
+            title: 'Estética Facial',
+            subtitle: 'Armonización y rejuvenecimiento.',
+            icon: <Sparkles size={56} strokeWidth={1.5} />,
+            theme: {
+                bg: 'from-fuchsia-50 via-white to-purple-50',
+                border: 'hover:border-fuchsia-300/50',
+                iconBox: 'bg-fuchsia-100 text-fuchsia-600',
+                textGradient: 'from-fuchsia-700 to-purple-800',
+                button: 'bg-fuchsia-600 hover:bg-fuchsia-700 shadow-fuchsia-200',
+                shadow: 'hover:shadow-fuchsia-900/10'
+            }
+        },
+        {
+            id: 'odontologia',
+            slug: 'primera-consulta-odontologica',
+            title: 'Odontología',
+            subtitle: 'Salud, ortodoncia y diseño de sonrisa.',
+            icon: <Smile size={56} strokeWidth={1.5} />,
+            theme: {
+                bg: 'from-cyan-50 via-white to-blue-50',
+                border: 'hover:border-cyan-300/50',
+                iconBox: 'bg-cyan-100 text-cyan-600',
+                textGradient: 'from-cyan-700 to-blue-800',
+                button: 'bg-cyan-600 hover:bg-cyan-700 shadow-cyan-200',
+                shadow: 'hover:shadow-cyan-900/10'
+            }
+        }
+    ];
+
     return (
-        <div className="min-h-screen bg-[#FDFDFD] font-sans text-slate-600 selection:bg-violet-100 selection:text-violet-900 relative overflow-x-hidden" style={{ scrollbarGutter: 'stable' }}>
+        <div className="min-h-screen bg-[#FDFDFD] font-sans text-slate-600 selection:bg-violet-100 selection:text-violet-900 relative overflow-x-hidden">
 
             {/* ATMÓSFERA SUTIL */}
             <div className="fixed top-0 left-0 w-full h-[400px] bg-gradient-to-b from-white via-slate-50 to-transparent pointer-events-none z-0" />
             <div className="fixed -top-40 -right-40 w-[600px] h-[600px] bg-indigo-50/40 rounded-full blur-[100px] pointer-events-none" />
 
-            {/* --- NAVBAR DINÁMICO (TODO A LA IZQUIERDA) --- */}
+            {/* --- NAVBAR DINÁMICO --- */}
             <motion.nav
                 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }}
                 className={`fixed top-0 left-0 right-0 z-40 px-6 py-4 flex items-center justify-between transition-all duration-500 ease-in-out ${isScrolled
-                        ? 'bg-white/90 backdrop-blur-md border-b border-slate-100/50 shadow-sm'
-                        : 'bg-transparent border-b border-transparent'
+                    ? 'bg-white/90 backdrop-blur-md border-b border-slate-100/50 shadow-sm'
+                    : 'bg-transparent border-b border-transparent'
                     }`}
             >
                 <div className="flex items-center gap-4">
-                    {/* BOTÓN VOLVER */}
                     <Link to="/" className="group flex items-center gap-2">
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${isScrolled ? 'bg-slate-50 border border-slate-200' : 'bg-white/80 border border-slate-200/60 shadow-sm'}`}>
                             <ChevronLeft size={18} className="text-slate-500 group-hover:text-slate-900 transition-colors" />
                         </div>
                         <span className={`text-sm font-semibold transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-500'} group-hover:text-slate-900 hidden sm:inline`}>
-                            Volver
+                            Volver al inicio
                         </span>
                     </Link>
-
-                    {/* SEPARADOR VERTICAL */}
                     <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
-
-                    {/* IDENTIDAD (SOLO TEXTO) */}
                     <h1 className="text-lg font-bold font-heading tracking-tight text-slate-900 leading-none">
                         Dra. Viviana Marco
                     </h1>
@@ -131,150 +102,114 @@ export default function BookingPage() {
             </motion.nav>
 
             {/* --- MAIN CONTENT --- */}
-            <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-20 min-h-screen flex flex-col">
+            <main className="relative z-10 max-w-6xl mx-auto px-6 h-screen flex flex-col justify-center items-center py-20 md:py-0">
 
-                {/* HEADER & SEARCH */}
-                <div className="max-w-3xl mx-auto text-center mb-12">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-                        className="text-3xl md:text-5xl font-bold text-slate-800 tracking-tight mb-8"
-                    >
-                        Agendá tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-500">visita.</span>
-                    </motion.h1>
-
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-                        className="relative group max-w-xl mx-auto"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-100 to-indigo-50 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                        <div className="relative flex items-center bg-white rounded-2xl border border-slate-200 shadow-sm group-hover:border-violet-200 group-hover:shadow-lg group-hover:shadow-violet-500/5 transition-all duration-300">
-                            <Search className="ml-5 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Buscar (ej: Toxina, Brackets, Consulta...)"
-                                value={searchTerm}
-                                onChange={handleSearchChange}
-                                className="w-full h-14 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 px-4 text-[15px] font-medium"
-                            />
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* CATEGORÍAS */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    className="flex flex-wrap justify-center gap-2 mb-12"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="text-center mb-16 max-w-3xl"
                 >
-                    {categories.map(cat => {
-                        const isActive = activeCategory === cat;
-                        const ui = CATEGORY_UI[cat] || CATEGORY_UI['Otros'];
-                        return (
-                            <button
-                                key={cat}
-                                onClick={() => { setActiveCategory(cat); setSearchTerm(''); }}
-                                className={`
-                             relative px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 border
-                             ${isActive
-                                        ? ui.activeClass + ' shadow-md transform scale-105'
-                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'}
-                          `}
-                            >
-                                <span className="flex items-center gap-2">
-                                    {cat !== 'Todos' && <span className={isActive ? 'text-white' : ui.color}>{ui.icon}</span>}
-                                    {cat}
-                                </span>
-                            </button>
-                        )
-                    })}
+                    <h2 className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight mb-6">
+                        Agendá tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-500">visita.</span>
+                    </h2>
+                    <p className="text-lg text-slate-500 font-light hidden md:block">
+                        Dos caminos, un mismo objetivo: tu bienestar y confianza.
+                    </p>
                 </motion.div>
 
-                {/* GRID DE TRATAMIENTOS */}
-                {loadingPrices ? (
-                    <div className="flex flex-col items-center justify-center py-24">
-                        <Loader2 className="animate-spin text-violet-500 mb-3" size={32} />
-                        <p className="text-sm font-medium text-slate-400">Cargando...</p>
-                    </div>
-                ) : (
-                    <motion.div
-                        layout
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-                    >
-                        <AnimatePresence mode="popLayout">
-                            {filteredTreatments.length > 0 ? filteredTreatments.map((item) => (
-                                <motion.div
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
-                                    key={item.slug}
-                                >
-                                    <button
-                                        onClick={() => handleSelect(item.slug)}
-                                        className="w-full h-full group bg-white hover:bg-[#FAFAFA] rounded-[1.5rem] p-6 text-left border border-slate-100 hover:border-violet-100 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_30px_-10px_rgba(124,58,237,0.06)] transition-all duration-300 flex flex-col relative overflow-hidden"
-                                    >
-                                        <div className="mb-4">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-violet-500 transition-colors">
-                                                {CATEGORY_UI[item.category]?.icon || <Layers size={12} />}
-                                                {item.category || 'General'}
-                                            </span>
-                                        </div>
+                {/* DUAL CARDS GRID */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full">
+                    {PORTALS.map((portal) => {
+                        const price = getPrice(portal.slug);
+                        const isHovered = hoveredCard === portal.id;
+                        const isDimmed = hoveredCard && hoveredCard !== portal.id;
 
-                                        <div className="mb-6 flex-grow">
-                                            <h3 className="text-[17px] font-semibold text-slate-800 leading-snug group-hover:text-violet-700 transition-colors mb-2">
-                                                {item.title}
-                                            </h3>
-                                            <div className="flex items-center gap-2 text-slate-400 text-xs font-medium">
-                                                <Clock size={12} /> {item.duration}
-                                            </div>
-                                        </div>
+                        return (
+                            <motion.button
+                                key={portal.id}
+                                onClick={() => handleSelect(portal.slug)}
+                                onMouseEnter={() => setHoveredCard(portal.id)}
+                                onMouseLeave={() => setHoveredCard(null)}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5, delay: 0.1 }}
+                                className={`
+                                    group relative w-full text-left rounded-[3rem] p-10 md:p-14
+                                    bg-gradient-to-br ${portal.theme.bg}
+                                    border border-white/80 shadow-2xl shadow-slate-200/50
+                                    transition-all duration-500 ease-out
+                                    ${portal.theme.border}
+                                    ${isDimmed ? 'opacity-40 blur-[2px] scale-[0.95]' : 'opacity-100 blur-0 scale-100'}
+                                    ${isHovered ? 'lg:scale-[1.03] lg:-translate-y-2 z-10' : 'z-0'}
+                                `}
+                            >
+                                <div className="relative z-10 flex flex-col h-full min-h-[320px]">
+                                    {/* Icon */}
+                                    <div className={`w-28 h-28 rounded-[2rem] ${portal.theme.iconBox} flex items-center justify-center mb-10 shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                                        {portal.icon}
+                                    </div>
 
-                                        <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Valor</span>
-                                                <span className="text-[15px] font-bold text-slate-700 group-hover:text-emerald-600 transition-colors">
-                                                    {`$${Number(item.price).toLocaleString('es-AR')}`}
-                                                </span>
-                                            </div>
-                                            <div className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-violet-600 group-hover:text-white transition-all duration-300">
-                                                <ArrowRight size={16} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                                    {/* Content */}
+                                    <div className="mb-8">
+                                        <h3 className={`text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${portal.theme.textGradient} mb-4`}>
+                                            {portal.title}
+                                        </h3>
+                                        <p className="text-slate-500 font-medium text-lg leading-relaxed">
+                                            {portal.subtitle}
+                                        </p>
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="mt-auto pt-8 border-t border-slate-900/5 flex items-end justify-between">
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Reserva</p>
+                                            <div className="h-9 flex items-center">
+                                                {loading ? (
+                                                    <div className="w-28 h-5 bg-slate-200 rounded animate-pulse" />
+                                                ) : (
+                                                    <span className="text-2xl font-bold text-slate-800">
+                                                        {price ? `$${price}` : 'Consultar'}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
-                                    </button>
-                                </motion.div>
-                            )) : (
-                                <div className="col-span-full text-center py-20">
-                                    <p className="text-slate-400 font-medium">No encontramos resultados.</p>
+                                        <div className={`w-16 h-16 rounded-full ${portal.theme.button} flex items-center justify-center text-white shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:shadow-xl`}>
+                                            <ArrowRight size={28} className="transition-transform duration-500 group-hover:translate-x-1" />
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
-                )}
+                            </motion.button>
+                        );
+                    })}
+                </div>
+
             </main>
 
             {/* --- MODAL CALENDARIO --- */}
             <AnimatePresence>
-                {selectedUrl && (
+                {selectedSlug && (
                     <motion.div
                         initial={{ opacity: 0, y: "100%" }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: "100%" }}
-                        transition={{ type: "spring", damping: 28, stiffness: 200 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed inset-0 z-[100] bg-white flex flex-col"
                     >
                         {/* Header del Modal */}
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white/90 backdrop-blur sticky top-0 z-10">
                             <div className="flex items-center gap-4">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                                 <h2 className="text-base font-medium text-slate-600">
-                                    Completando <span className="text-slate-900 font-semibold ml-1">reserva</span>
+                                    Reserva en curso
                                 </h2>
                             </div>
 
                             <button
-                                onClick={() => setSelectedUrl(null)}
-                                className="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all"
+                                onClick={() => setSelectedSlug(null)}
+                                className="w-10 h-10 rounded-full bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all group"
                             >
-                                <X size={20} />
+                                <X size={20} className="group-hover:rotate-90 transition-transform" />
                             </button>
                         </div>
 
@@ -283,11 +218,11 @@ export default function BookingPage() {
                             {!isIframeLoaded && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
                                     <Loader2 className="animate-spin text-violet-500 mb-3" size={32} />
-                                    <p className="text-sm font-medium text-slate-400">Conectando agenda...</p>
+                                    <p className="text-sm font-medium text-slate-400">Conectando con la agenda...</p>
                                 </div>
                             )}
                             <iframe
-                                src={selectedUrl}
+                                src={`${CAL_BASE_URL}/${selectedSlug}?embed=true&theme=light`}
                                 className={`w-full h-full border-none transition-opacity duration-700 ${isIframeLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 onLoad={() => setIsIframeLoaded(true)}
                                 allow="camera; microphone; autoplay; fullscreen"
