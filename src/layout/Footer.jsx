@@ -114,8 +114,8 @@ const Footer = () => {
             </div>
 
             <div className="mt-8 pt-6 border-t border-white/10 flex gap-3">
-              <SocialIcon icon={<Instagram />} />
-              <SocialIcon icon={<Facebook />} />
+              <SocialIcon icon={<Instagram />} href="https://www.instagram.com/draviviana_marco" />
+              <SocialIcon icon={<Facebook />} href="https://www.facebook.com/profile.php?id=61579426071673#" />
             </div>
           </div>
 
@@ -175,8 +175,8 @@ const FooterLink = ({ href, children }) => (
   </li>
 );
 
-const SocialIcon = ({ icon }) => (
-  <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
+const SocialIcon = ({ icon, href }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
     {React.cloneElement(icon, { size: 18 })}
   </a>
 );
