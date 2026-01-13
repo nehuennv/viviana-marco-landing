@@ -190,6 +190,7 @@ const MobileMenuPortal = ({ isOpen, onClose, links, handleNavClick }) => {
           animate={{ opacity: 1, clipPath: "circle(150% at 100% 0%)" }}
           exit={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          style={{ willChange: 'transform' }}
           className="fixed inset-0 z-[50] bg-white/95 backdrop-blur-3xl flex flex-col justify-center items-center will-change-[clip-path]"
         >
           {/* Fondo estático en móvil para evitar lag */}

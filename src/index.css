@@ -14,8 +14,6 @@
   html {
     font-size: 15px;
     -webkit-text-size-adjust: 100%;
-    /* Fix para móviles: Fondo blanco en el "rebote" del scroll */
-    background-color: #ffffff;
   }
 
   @media (min-width: 768px) {
@@ -24,12 +22,29 @@
     }
   }
 
+  /* 🛡️ BLINDAJE VISUAL & ESTABILIDAD 🛡️ */
+  html {
+    background-color: #ffffff !important;
+    height: 100%;
+  }
+
   body {
-    font-family: 'Poppins', sans-serif;
-    /* Aseguramos texto oscuro y fondo blanco a fuego */
-    @apply text-slate-800 antialiased bg-white;
+    background-color: transparent !important;
+    background-image: none !important;
+    color: #0f172a !important;
+    /* Slate-900 */
+
+    /* ESTABILIDAD DE SCROLL (Anti-Rebote) */
+    height: 100dvh;
+    overscroll-behavior-y: none;
+    scrollbar-gutter: stable;
     width: 100%;
     overflow-x: hidden;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    @apply antialiased;
   }
 
   /* --- 2. PREMIUM SCROLLBAR (OPTIMIZADO) --- */
