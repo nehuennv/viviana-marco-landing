@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRight, CalendarCheck, Sparkles } from 'lucide-react';
 // IMPORTANTE: Agregamos 'useAnimation' para controlar manualmente la entrada
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useAnimation } from 'framer-motion';
-import consultorioHeader from '../assets/consultorio-hero.webp';
+const consultorioHeader = `${import.meta.env.BASE_URL}assets/consultorio-hero.webp`;
 
 const heroVariants = [
   // --- 1. AUTORIDAD LOCAL (Perfil Profesional) ---

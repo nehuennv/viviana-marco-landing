@@ -71,7 +71,7 @@ const BookingUnified = ({ initialTreatment }) => {
       let mappedTreatment = "Primera Consulta Estética"; // Default
 
       // Palabras clave para Odontología
-      const dentalKeywords = ['ortodoncia', 'diente', 'bracket', 'alineador', 'dental', 'blanqueamiento', 'conducto', 'muela', 'general'];
+      const dentalKeywords = ['ortodoncia', 'diente', 'bracket', 'alineador', 'dental', 'blanqueamiento', 'conducto', 'muela', 'general', 'placa', 'ronquido', 'bruxismo'];
       if (dentalKeywords.some(k => lower.includes(k))) {
         mappedTreatment = "Primera Consulta Odontológica";
       }
@@ -85,7 +85,7 @@ const BookingUnified = ({ initialTreatment }) => {
   const handleWhatsAppSubmit = (e) => {
     e.preventDefault();
     const phoneNumber = "5492995977208";
-    const message = `Hola Dra, soy ${formData.nombre} ${formData.apellido}. Me gustaría agendar un turno para: *${formData.tratamiento || "Consulta General"}*.`;
+    const message = `Hola Dra, soy ${formData.nombre} ${formData.apellido}. Me gustaría agendar un turno para: *${formData.tratamiento}*.`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -200,12 +200,9 @@ const BookingUnified = ({ initialTreatment }) => {
                       <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Tratamiento de Interés</label>
                       <div className="relative">
                         <select name="tratamiento" value={formData.tratamiento} onChange={handleFormChange} className="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-base font-medium text-slate-700 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all shadow-sm appearance-none cursor-pointer">
-                          <option value="" disabled>Seleccioná el tratamiento...</option>
-                          <option value="Consulta General">Consulta General</option>
-                          <optgroup label="Disponibles">
-                            <option value="Primera Consulta Estética">Primera Consulta Estética</option>
-                            <option value="Primera Consulta Odontológica">Primera Consulta Odontológica</option>
-                          </optgroup>
+                          <option value="" disabled>Seleccioná el motivo de consulta...</option>
+                          <option value="Primera Consulta Estética">Primera Consulta Estética</option>
+                          <option value="Primera Consulta Odontológica">Primera Consulta Odontológica</option>
                         </select>
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg></div>
                       </div>
@@ -239,7 +236,7 @@ const BookingUnified = ({ initialTreatment }) => {
                   className={`
                     rounded-[2.5rem] border border-slate-200 overflow-hidden relative
                     ${!selectedSlug
-                      ? 'w-full max-w-2xl p-6 md:p-8 bg-white/60 backdrop-blur-md shadow-2xl shadow-violet-900/5'
+                      ? 'w-full max-w-2xl h-auto p-6 md:p-8 bg-white/60 backdrop-blur-md shadow-2xl shadow-violet-900/5'
                       : 'w-full max-w-5xl h-[700px] p-0 bg-white shadow-xl'}
                   `}
                 >

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // ⚠️ TU CONFIGURACIÓN REAL
-const BASEROW_TOKEN = 'RGLLjgYjrFUZnUTEoq5eu89cicbbAlj6';
+const BASEROW_TOKEN = 'VAQd2L4nqAdkF502VXgy1pkTOEotuRyy';
 const TABLE_ID = '783181';
 
 export function useBaserow() {
@@ -9,6 +9,11 @@ export function useBaserow() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // SEGURIDAD: Advertencia en desarrollo sobre el token expuesto
+        if (import.meta.env.DEV) {
+            console.warn("⚠️ BASEROW TOKEN VISIBLE: Este token es público. Asegurate de que tenga permisos de 'Solo Lectura' en Baserow.");
+        }
+
         const fetchPrices = async () => {
             try {
                 const response = await fetch(

@@ -4,6 +4,9 @@ import { Smile, Sparkles, Syringe, Moon, Zap, User, ArrowUpRight, Activity, Scan
 import { motion, AnimatePresence } from 'framer-motion';
 import ServiceModal from '../components/ServiceModal';
 
+// Helper para imágenes locales
+const getPath = (img) => `${import.meta.env.BASE_URL}assets/tratamientos/${img}`;
+
 // --- DATA ---
 const facialAesthetics = [
   {
@@ -13,7 +16,7 @@ const facialAesthetics = [
     desc: "Relaja músculos del tercio superior para suavizar expresiones.",
     longDesc: "El tratamiento ideal para suavizar la expresión. Aplicamos toxina botulínica en tercio superior para relajar la musculatura, eliminando arrugas de frente, entrecejo y patas de gallo sin perder naturalidad.",
     steps: ["Evaluación mímica", "Diseño de puntos", "Aplicación (10 min)", "Control 15 días"],
-    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('botox.webp'),
     icon: <Syringe size={24} />,
   },
   {
@@ -23,7 +26,7 @@ const facialAesthetics = [
     desc: "Perfilado e hidratación labial con ácido hialurónico premium.",
     longDesc: "Utilizamos ácido hialurónico para perfilar, hidratar y dar volumen sutil a los labios. También realizamos rinomodelación y relleno de pómulos/mentón para armonizar el perfil.",
     steps: ["Anestesia tópica", "Diseño anatómico", "Aplicación", "Resultados inmediatos"],
-    image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('labios.webp'),
     icon: <User size={24} />,
   },
   {
@@ -33,7 +36,7 @@ const facialAesthetics = [
     desc: "Cóctel nutritivo NCTF para revitalizar y dar luminosidad.",
     longDesc: "Microinyecciones de un complejo nutritivo que revitaliza la piel apagada, mejora poros dilatados y aporta una luminosidad inigualable ('Glow Effect').",
     steps: ["Limpieza profunda", "Aplicación Meso", "Máscara descongestiva", "Piel radiante"],
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('mesoterapia.webp'),
     icon: <Sparkles size={24} />,
   },
   {
@@ -43,7 +46,7 @@ const facialAesthetics = [
     desc: "Generación de colágeno propio para combatir la flacidez.",
     longDesc: "Utilizamos bioestimuladores (Radiesse/Sculptra) que estimulan a tu cuerpo a producir colágeno. Tratamiento #1 para combatir la flacidez facial a largo plazo.",
     steps: ["Vectores de tensión", "Aplicación cánula", "Estimulación progresiva", "Pico efecto 3 meses"],
-    image: "https://images.unsplash.com/photo-1609188076864-c35269136b09?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('bioestimulacion.webp'),
     icon: <Activity size={24} />,
   },
   {
@@ -53,7 +56,7 @@ const facialAesthetics = [
     desc: "Relajación de maseteros para reducir mordida y afinar rostro.",
     longDesc: "Tratamiento médico-estético. Reducimos la fuerza de la mordida involuntaria, protegiendo tus dientes del desgaste y afinando visualmente el rostro.",
     steps: ["Palpación muscular", "Aplicación", "Alivio de tensión", "Protección dental"],
-    image: "https://plus.unsplash.com/premium_photo-1661774916843-14975d04595e?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('bruxismo.webp'),
     icon: <ScanFace size={24} />,
   }
 ];
@@ -66,7 +69,7 @@ const orthodontics = [
     desc: "Ortodoncia sin brackets. Placas transparentes y removibles.",
     longDesc: "La opción premium. Placas transparentes que cambias cada semana. Nadie notará que los llevas puestos. Comé lo que quieras y cepillate sin obstáculos.",
     steps: ["Escaneo 3D", "Planificación digital", "Entrega de set", "Controles"],
-    image: "https://images.unsplash.com/photo-1598256989626-60ed1543c21b?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('alineadores.webp'),
     icon: <Smile size={24} />,
   },
   {
@@ -76,7 +79,7 @@ const orthodontics = [
     desc: "Sistema de baja fricción. Más rápidos y con menos molestias.",
     longDesc: "Tecnología de autoligado. No llevan 'gomitas', lo que permite que el diente se mueva más rápido y con menos dolor. Ideales para casos complejos.",
     steps: ["Cementado preciso", "Arcos termoactivos", "Menos visitas", "Sonrisa amplia"],
-    image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('brackets.webp'),
     icon: <Zap size={24} />,
   },
   {
@@ -86,7 +89,7 @@ const orthodontics = [
     desc: "Dispositivos de avance mandibular para mejorar el sueño.",
     longDesc: "Dispositivo que libera la vía aérea durante la noche. Es pequeño, cómodo y cambia la vida del paciente (y su pareja) al reducir ronquidos.",
     steps: ["Diagnóstico sueño", "Toma de registros", "Confección", "Descanso reparador"],
-    image: "https://plus.unsplash.com/premium_photo-1661777196224-bfda51e61cfd?q=80&w=600&auto=format&fit=crop&fm=webp",
+    image: getPath('ronquidos.webp'),
     icon: <Moon size={24} />,
   }
 ];
