@@ -25,8 +25,8 @@ const heroVariants = [
   {
     titleStart: "Armonización",
     highlight: "Orofacial",
-    titleEnd: "Médica.", // Total: 3 palabras
-    description: "Rejuvenecimiento facial sutil con Botox y Hialurónico. Realzamos tus rasgos naturales respetando la anatomía de tu rostro."
+    titleEnd: "", // Total: 2 palabras
+    description: "Rejuvenecimiento facial sutil con Botox, Ácido Hialurónico y Bioestimuladores. Realzamos tus rasgos naturales respetando la anatomía de tu rostro."
   },
 
   // --- 4. TECNOLOGÍA DAMON (Eficiencia) ---
@@ -50,7 +50,13 @@ const heroVariants = [
     titleStart: "Estética Facial y",
     highlight: "Salud Integral.",
     titleEnd: "", // Total: 4 palabras
-    description: "Un enfoque médico que prioriza tu bienestar. Recuperá la seguridad en tu imagen con tratamientos mínimamente invasivos y seguros."
+    description: "Un enfoque profesional que prioriza tu bienestar. Recuperá la seguridad en tu imagen con tratamientos mínimamente invasivos y seguros."
+  },
+  {
+    titleStart: "Placas para ronquidos y",
+    highlight: "Salud Apneas del sueño.",
+    titleEnd: "", 
+    description: "Recupera la calidad de sueño utilizando las placas de adelantamiento mandibular que te ayuda a  descansar mejor durante las noches disminuyendo los ronquidos y apneas que interrumpen tu sueño."
   }
 ];
 

@@ -104,11 +104,14 @@ const Footer = () => {
             <div>
               <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">Contacto</h4>
               <div className="space-y-4">
-                <a href="mailto:Mdravivianamarco@gmail.com" className="flex items-center gap-3 text-sm md:text-lg hover:text-primary transition-colors break-all">
-                  <Mail size={18} className="text-slate-400 flex-shrink-0" /> Mdravivianamarco@gmail.com
+                <a href="mailto:dravivianamarco@gmail.com" className="flex items-center gap-3 text-sm md:text-lg hover:text-primary transition-colors break-all">
+                  <Mail size={18} className="text-slate-400 flex-shrink-0" /> dravivianamarco@gmail.com
                 </a>
                 <a href="https://wa.me/5492995977208" target="_blank" className="flex items-center gap-3 text-lg hover:text-primary transition-colors">
                   <Phone size={18} className="text-slate-400 flex-shrink-0" /> +54 9 299 597-7208
+                </a>
+                <a href="https://wa.me/5492994667386" target="_blank" className="flex items-center gap-3 text-lg hover:text-primary transition-colors">
+                  <Phone size={18} className="text-slate-400 flex-shrink-0" />  +54 9 299 466-7386 
                 </a>
               </div>
             </div>
