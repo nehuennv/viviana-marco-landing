@@ -16,7 +16,7 @@ const facialAesthetics = [
     desc: "Relaja los músculos faciales, suavizando las líneas de expresión.",
     longDesc: "El tratamiento ideal y seguro para suavizar la expresión. Aplicamos toxina botulínica para relajar la musculatura, eliminando arrugas de frente, entrecejo y patas de gallo sin perder naturalidad.",
     steps: ["Evaluación mímica", "Diseño de puntos", "Aplicación (10 min)", "Control 15 días"],
-    image: getPath('botox.webp'),
+    image: getPath('tratamiento-toxina-botulinica-full-face.webp'),
     icon: <Syringe size={24} />,
   },
   {
@@ -26,7 +26,7 @@ const facialAesthetics = [
     desc: "Perfilado e hidratación labial con ácido hialurónico premium.",
     longDesc: "Utilizamos ácido hialurónico para perfilar, hidratar y dar volumen sutil a los labios. También realizamos relleno de pómulos/mentón para armonizar el perfil.",
     steps: ["Anestesia tópica", "Diseño anatómico", "Aplicación", "Resultados inmediatos"],
-    image: getPath('labios.webp'),
+    image: getPath('tratamiento-relleno-labios-acido-hialuronico.webp'),
     icon: <User size={24} />,
   },
   {
@@ -36,7 +36,7 @@ const facialAesthetics = [
     desc: "Mesoterapia francesa, coreana y exosomas para revitalizar y dar luminosidad.",
     longDesc: "Tratamiento con activos nutritivos que revitaliza la piel apagada, mejora la apariencia de los poros y aporta una luminosidad natural e inmediata  ('Glow Effect').",
     steps: ["Limpieza profunda", "Aplicación Meso", "Máscara descongestiva", "Piel radiante"],
-    image: getPath('mesoterapia.webp'),
+    image: getPath('tratamiento-mesoterapia-facial-glow.webp'),
     icon: <Sparkles size={24} />,
   },
   {
@@ -46,7 +46,7 @@ const facialAesthetics = [
     desc: "Generación de colágeno y elastina propio para combatir la flacidez.",
     longDesc: "Utilizamos bioestimuladores (Radiesse/Sculptra) que estimulan a tu cuerpo a producir nuevo colágeno y elastina. Tratamiento #1 para combatir la flacidez facial a largo plazo.",
     steps: ["Vectores de tensión", "Aplicación con cánula", "Estimulación progresiva", "Pico efecto 3 meses"],
-    image: getPath('bioestimulacion.webp'),
+    image: getPath('tratamiento-bioestimulacion-colageno.webp'),
     icon: <Activity size={24} />,
   },
   {
@@ -56,7 +56,7 @@ const facialAesthetics = [
     desc: "Relajación de maseteros para reducir el apretamiento y afinar rostro.",
     longDesc: "Tratamiento médico-estético. Reducimos la fuerza de la mordida involuntaria, protegiendo tus dientes del desgaste, mejorando dolores cervicales y de cabeza y afinando visualmente el rostro.",
     steps: ["Palpación muscular", "Aplicación", "Alivio de tensión", "Protección dental"],
-    image: getPath('bruxismo.webp'),
+    image: getPath('tratamiento-bruxismo-relajacion-maseteros.webp'),
     icon: <ScanFace size={24} />,
   }
 ];
@@ -69,7 +69,7 @@ const orthodontics = [
     desc: "Ortodoncia invisible. Placas transparentes y removibles.",
     longDesc: "La opción premium. Placas transparentes que cambias cada 15 días. Nadie notará que los llevas puestos. Comé lo que quieras y cepillate sin obstáculos.",
     steps: ["Escaneo 3D", "Planificación digital", "Entrega de set", "Controles"],
-    image: getPath('alineadores.webp'),
+    image: getPath('tratamiento-ortodoncia-invisible-alineadores.webp'),
     icon: <Smile size={24} />,
   },
   {
@@ -79,7 +79,7 @@ const orthodontics = [
     desc: "Sistema de baja fricción. Más rápidos y con menos molestias.",
     longDesc: "Tecnología de autoligado. No llevan 'gomitas', lo que permite que el diente se mueva más rápido y con menos dolor. Ideales para casos complejos.",
     steps: ["Cementado preciso", "Arcos termoactivos", "Menos visitas", "Sonrisa amplia"],
-    image: getPath('brackets.webp'),
+    image: getPath('tratamiento-ortodoncia-brackets-damon.webp'),
     icon: <Zap size={24} />,
   },
   {
@@ -89,7 +89,7 @@ const orthodontics = [
     desc: "Dispositivos de avance mandibular para mejorar calidad de sueño.",
     longDesc: "Dispositivo que libera la vía aérea durante la noche. Es pequeño, cómodo y cambia la vida del paciente (y su pareja) al reducir ronquidos y apneas.",
     steps: ["Diagnóstico sueño", "Toma de registros", "Confección", "Descanso reparador"],
-    image: getPath('ronquidos.webp'),
+    image: getPath('tratamiento-dispositivo-anti-ronquidos.webp'),
     icon: <Moon size={24} />,
   }
 ];
