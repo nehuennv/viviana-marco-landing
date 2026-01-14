@@ -33,7 +33,7 @@ const facialAesthetics = [
     id: 'f3',
     category: "Piel & Glow",
     title: "Mesoterapia",
-    desc: "Mesoterapia francesa, coreana y exosomas para revitalizar y dar luminosidad.",
+    desc: "Mesoterapia francesa, coreana y exosomas para revitalizar.",
     longDesc: "Tratamiento con activos nutritivos que revitaliza la piel apagada, mejora la apariencia de los poros y aporta una luminosidad natural e inmediata  ('Glow Effect').",
     steps: ["Limpieza profunda", "Aplicación Meso", "Máscara descongestiva", "Piel radiante"],
     image: getPath('tratamiento-mesoterapia-facial-glow.webp'),
@@ -54,7 +54,7 @@ const facialAesthetics = [
     category: "Terapéutico",
     title: "Bruxismo",
     desc: "Relajación de maseteros para reducir el apretamiento y afinar rostro.",
-    longDesc: "Tratamiento médico-estético. Reducimos la fuerza de la mordida involuntaria, protegiendo tus dientes del desgaste, mejorando dolores cervicales y de cabeza y afinando visualmente el rostro.",
+    longDesc: "Tratamiento médico-estético. Reducimos la fuerza de la mordida involuntaria, protegiendo tus dientes del desgaste, mejorando dolores cervicales y de cabeza afinando visualmente el rostro.",
     steps: ["Palpación muscular", "Aplicación", "Alivio de tensión", "Protección dental"],
     image: getPath('tratamiento-bruxismo-relajacion-maseteros.webp'),
     icon: <ScanFace size={24} />,
@@ -204,7 +204,7 @@ const ServiceCard = ({ service, onClick, isCenter }) => (
         <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-2 md:mb-3 md:group-hover:text-slate-900 transition-colors duration-500 ease-in-out">
           {service.title}
         </h3>
-        <p className="text-slate-500 text-xs md:text-sm leading-relaxed text-pretty">
+        <p className="text-slate-500 text-xs md:text-sm leading-relaxed text-pretty line-clamp-2">
           {service.desc}
         </p>
       </div>

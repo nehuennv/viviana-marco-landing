@@ -31,7 +31,7 @@ const About = () => {
     },
     {
       label: "Estética Facial",
-      text: "Diplomado en Armonización Orofacial.",
+      text: "Diplomado en Armonización Orofacial UBA.",
       icon: Sparkles
     }
   ];
