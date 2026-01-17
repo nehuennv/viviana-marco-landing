@@ -29,6 +29,9 @@ const CheckoutPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [timeLeft, setTimeLeft] = useState(900);
 
+    const [status, setStatus] = useState('pending'); // 'pending', 'paid', 'expired'
+    const [bookingDetails, setBookingDetails] = useState(null);
+
     // --- FUNCIÓN DE RASTREO DE PARAMETROS ---
     const getCalParam = (keys) => {
         for (const key of keys) {
@@ -38,8 +41,8 @@ const CheckoutPage = () => {
         return '';
     };
 
-    // Capturamos los datos
-    const bookingData = {
+    // Capturamos los datos DEL URL (Fallback/Initial)
+    const initialBookingData = {
         uid: getCalParam(['uid', 'bookingUid', 'id']),
         date: getCalParam(['date', 'startTime', 'start']),
         type: getCalParam(['type', 'eventTypeSlug']),
@@ -49,24 +52,62 @@ const CheckoutPage = () => {
         phone: getCalParam(['phone', 'attendeePhoneNumber', 'responses[phone]', 'guests[0][phone]'])
     };
 
+    // 1. TIMER VISUAL (UX Only - Backend valida expiration real)
+    useEffect(() => {
+        if (!initialBookingData.uid) return;
+
+        const STORAGE_KEY = `booking_timer_${initialBookingData.uid}`;
+        const LINK_DURATION = 900; // 15 minutos en segundos
+
+        // Recuperar inicio o setear nuevo
+        let startTime = localStorage.getItem(STORAGE_KEY);
+
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem(STORAGE_KEY, startTime);
+        } else {
+            startTime = parseInt(startTime, 10);
+        }
+
+        // Función de tick
+        const tick = () => {
+            const now = Date.now();
+            const elapsedSeconds = Math.floor((now - startTime) / 1000);
+            const remaining = LINK_DURATION - elapsedSeconds;
+
+            if (remaining <= 0) {
+                setTimeLeft(0);
+                setStatus('expired'); // UX Expiration
+            } else {
+                setTimeLeft(remaining);
+            }
+        };
+
+        tick(); // Primer tick inmediato
+        const interval = setInterval(tick, 1000);
+
+        return () => clearInterval(interval);
+    }, [initialBookingData.uid]);
+
+
+    // 2. FETCH DATOS & LINK (Prioridad Backend)
     useEffect(() => {
         console.log("🔍 URL Search Params:", searchParams.toString());
-        console.log("✅ DATOS CAPTURADOS:", bookingData);
 
         const fetchPaymentLink = async () => {
-            if (!bookingData.uid) {
-                console.warn("⚠️ No se encontró UID, no se puede iniciar pago.");
+            if (!initialBookingData.uid) {
+                console.warn("⚠️ No se encontró UID.");
                 setIsLoading(false);
                 return;
             }
 
             try {
-                // LLAMADA AL NUEVO BACKEND (Solo UID según doc)
+                // LLAMADA AL BACKEND
                 const response = await fetch(API_BOOKING_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        uid: bookingData.uid
+                        uid: initialBookingData.uid
                     }),
                 });
 
@@ -79,9 +120,20 @@ const CheckoutPage = () => {
                 const data = await response.json();
                 console.log("🔥 RESPUESTA BACKEND:", data);
 
-                // Según documentación: { success: true, payment_link: "...", ... }
+                // A. Verificar si ya está pagado
+                if (data.status === 'paid' || data.paymentStatus === 'paid') {
+                    setStatus('paid');
+                    setIsLoading(false);
+                    return;
+                }
+
+                // B. Verificar link de pago
                 if (data.success && data.payment_link) {
                     setPaymentLink(data.payment_link);
+                    // Si el backend devuelve info del booking, usarla en vez de URL params
+                    if (data.booking) {
+                        setBookingDetails(data.booking);
+                    }
                 } else {
                     console.error("❌ No se recibió payment_link válido", data);
                 }
@@ -91,15 +143,15 @@ const CheckoutPage = () => {
             } finally {
                 setIsLoading(false);
             }
-
         };
 
-
         fetchPaymentLink();
-
-        const timer = setInterval(() => setTimeLeft((p) => (p > 0 ? p - 1 : 0)), 1000);
-        return () => clearInterval(timer);
     }, []);
+
+    // --- RENDER HELPERS ---
+
+    // Usar datos del backend si existen, sino usar URL params
+    const displayData = bookingDetails || initialBookingData;
 
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
@@ -108,13 +160,13 @@ const CheckoutPage = () => {
     };
 
     // Formateo de fecha
-    const displayDate = bookingData.date
-        ? new Date(bookingData.date).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) + ' hs'
+    const displayDate = displayData.date
+        ? new Date(displayData.date).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) + ' hs'
         : 'Fecha a confirmar';
 
     // Handler para redirigir
     const handlePayClick = () => {
-        if (paymentLink) {
+        if (paymentLink && status !== 'expired') {
             window.location.href = paymentLink;
         }
     };
@@ -141,15 +193,38 @@ const CheckoutPage = () => {
 
                         {/* HEADER SECTION */}
                         <div>
-                            <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-6 border border-amber-100 shadow-sm">
-                                <Clock size={12} /> Esperando pago
-                            </div>
+                            {status === 'paid' ? (
+                                <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-6 border border-green-200 shadow-sm">
+                                    <CheckCircle2 size={12} /> Pago Acreditado
+                                </div>
+                            ) : status === 'expired' ? (
+                                <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-6 border border-red-200 shadow-sm">
+                                    <AlertCircle size={12} /> Turno Expirado
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-6 border border-amber-100 shadow-sm">
+                                    <Clock size={12} /> Esperando pago
+                                </div>
+                            )}
+
                             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-tight mb-4 drop-shadow-sm">
-                                Tu reserva está <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-600">Pendiente</span>.
+                                {status === 'paid' ? (
+                                    <>Tu reserva está <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600">Confirmada</span>.</>
+                                ) : status === 'expired' ? (
+                                    <>Tu reserva ha <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-600">Expirado</span>.</>
+                                ) : (
+                                    <>Tu reserva está <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-600">Pendiente</span>.</>
+                                )}
                             </h1>
                             <p className="text-slate-600 font-medium text-pretty leading-relaxed max-w-md">
-                                Tienes <strong className="text-slate-900">15 minutos</strong> para realizar el pago.
-                                El turno se liberará automáticamente si no se confirma.
+                                {status === 'paid' ? (
+                                    "Hemos recibido tu pago correctamente. Recibirás un correo con los detalles de tu turno."
+                                ) : status === 'expired' ? (
+                                    "El tiempo límite para realizar el pago ha finalizado. Por favor, vuelve a intentar reservar un turno."
+                                ) : (
+                                    <>Tienes <strong className="text-slate-900">15 minutos</strong> para realizar el pago.
+                                        El turno se liberará automáticamente si no se confirma.</>
+                                )}
                             </p>
                         </div>
 
@@ -164,7 +239,7 @@ const CheckoutPage = () => {
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tratamiento</p>
                                 </div>
                                 <p className="text-base font-bold text-slate-900 capitalize leading-tight">
-                                    {bookingData.type?.replace(/-/g, ' ') || 'Consulta General'}
+                                    {displayData.type?.replace(/-/g, ' ') || 'Consulta General'}
                                 </p>
                             </div>
 
@@ -185,11 +260,11 @@ const CheckoutPage = () => {
                         {/* USER FOOTER */}
                         <div className="flex items-center gap-4 pt-2">
                             <div className="w-10 h-10 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center font-bold text-slate-600 text-sm">
-                                {bookingData.name ? bookingData.name.charAt(0).toUpperCase() : <ShieldCheck size={18} />}
+                                {displayData.name ? displayData.name.charAt(0).toUpperCase() : <ShieldCheck size={18} />}
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-slate-900">{bookingData.name || 'Paciente'}</p>
-                                <p className="text-xs text-slate-400">{bookingData.email || 'Email no disponible'}</p>
+                                <p className="text-sm font-bold text-slate-900">{displayData.name || 'Paciente'}</p>
+                                <p className="text-xs text-slate-400">{displayData.email || 'Email no disponible'}</p>
                             </div>
                         </div>
                     </div>
@@ -198,10 +273,12 @@ const CheckoutPage = () => {
                     <div className="lg:col-span-5 bg-slate-50/50 border-t lg:border-t-0 lg:border-l border-slate-200/60 p-8 lg:p-12 flex flex-col justify-center gap-8 relative">
 
                         {/* TIMER CARD */}
-                        <div className="bg-slate-900 text-white p-6 rounded-[1.5rem] shadow-2xl shadow-slate-900/20 relative overflow-hidden group border border-slate-800">
+                        <div className={`bg-slate-900 text-white p-6 rounded-[1.5rem] shadow-2xl shadow-slate-900/20 relative overflow-hidden group border border-slate-800 transition-all duration-500 ${status === 'expired' ? 'grayscale opacity-70' : ''}`}>
                             <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
                             <div className="relative z-10 text-center">
-                                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">El turno expira en</p>
+                                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
+                                    {status === 'expired' ? 'TIEMPO AGOTADO' : 'El turno expira en'}
+                                </p>
                                 <div className="text-5xl font-black tracking-tighter tabular-nums text-white flex justify-center items-center gap-2">
                                     {formatTime(timeLeft)}
                                 </div>
@@ -220,7 +297,7 @@ const CheckoutPage = () => {
                         <div className="text-center space-y-6">
                             <div>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total a Pagar</p>
-                                <div className="text-4xl font-black text-slate-900 tracking-tighter drop-shadow-sm">
+                                <div className={`text-4xl font-black text-slate-900 tracking-tighter drop-shadow-sm ${status === 'paid' ? 'text-green-600' : ''}`}>
                                     $15.000
                                 </div>
                             </div>
@@ -229,7 +306,17 @@ const CheckoutPage = () => {
                                 {isLoading ? (
                                     <button disabled className="w-full py-4 bg-white border border-slate-200 rounded-xl flex items-center justify-center gap-3 text-slate-400 cursor-not-allowed shadow-sm">
                                         <Loader2 size={20} className="animate-spin text-slate-400" />
-                                        <span className="font-bold text-sm">Procesando...</span>
+                                        <span className="font-bold text-sm">Verificando...</span>
+                                    </button>
+                                ) : status === 'paid' ? (
+                                    <button disabled className="w-full py-4 bg-green-500 text-white rounded-xl flex items-center justify-center gap-2 font-bold text-lg shadow-lg cursor-default">
+                                        <span>Pago Completado</span>
+                                        <CheckCircle2 size={20} />
+                                    </button>
+                                ) : status === 'expired' ? (
+                                    <button disabled className="w-full py-4 bg-slate-200 text-slate-400 rounded-xl flex items-center justify-center gap-2 font-bold text-lg cursor-not-allowed">
+                                        <span>Link Vencido</span>
+                                        <AlertCircle size={20} />
                                     </button>
                                 ) : paymentLink ? (
                                     <a
