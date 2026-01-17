@@ -150,8 +150,17 @@ const CheckoutPage = () => {
 
     // --- RENDER HELPERS ---
 
-    // Usar datos del backend si existen, sino usar URL params
-    const displayData = bookingDetails || initialBookingData;
+    // Usar datos del backend si existen, sino usar URL params (MERGE ESTRATÉGICO)
+    // Priorizamos backend, pero si falta info usamos el fallback del URL
+    const displayData = {
+        ...initialBookingData,
+        ...(bookingDetails || {}),
+        // Force valid keys if backend implies empty
+        name: bookingDetails?.name || initialBookingData.name,
+        email: bookingDetails?.email || initialBookingData.email,
+        type: bookingDetails?.type || initialBookingData.type,
+        date: bookingDetails?.date || initialBookingData.date
+    };
 
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
