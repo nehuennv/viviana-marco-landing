@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import { useSearchParams } from 'react-router-dom';
+import { initMercadoPago } from '@mercadopago/sdk-react';
 import {
     ShieldCheck,
     Clock,
@@ -9,8 +9,10 @@ import {
     AlertCircle,
     ArrowRight,
     CheckCircle2,
-    Phone,
-    User
+    Sparkles,
+    CreditCard,
+    Zap,
+    Timer
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -118,99 +120,139 @@ const CheckoutPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 relative font-sans selection:bg-violet-100 selection:text-violet-900 flex items-center justify-center p-4">
-
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-20%] left-[-10%] w-[90vw] h-[90vw] bg-violet-200/40 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] bg-purple-100/50 rounded-full blur-[100px]" />
+        <div className="min-h-screen bg-slate-50 relative font-sans flex items-center justify-center p-4 lg:p-8 overflow-hidden">
+            {/* --- FONDO DISRUPTIVO (Strict Brand Purple) --- */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-20%] left-[-10%] w-[90vw] h-[90vw] bg-violet-300/30 rounded-full blur-[120px] mix-blend-multiply" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] bg-purple-200/40 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative z-10 w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl border border-white/50 overflow-hidden"
+                initial={{ opacity: 0, scale: 0.98, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="relative z-10 w-full max-w-5xl"
             >
-                <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-6 text-white text-center">
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border border-white/10">
-                            <Clock size={14} /> Reserva en proceso
-                        </div>
-                        <div className="text-4xl font-black tracking-tighter tabular-nums">
-                            {formatTime(timeLeft)}
-                        </div>
-                    </div>
-                </div>
+                {/* --- UNIFIED MODAL CONTAINER --- */}
+                <div className="bg-white/60 backdrop-blur-3xl border border-white/80 rounded-[2.5rem] shadow-[0_40px_100px_-10px_rgba(0,0,0,0.15)] overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[600px] ring-1 ring-white/50">
 
-                <div className="p-8">
-                    <div className="mb-6 pb-6 border-b border-slate-100">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Paciente</h3>
-                            {bookingData.dni && (
-                                <span className="text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-mono">
-                                    DNI: {bookingData.dni}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                                <User size={20} />
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold text-slate-800">{bookingData.name}</p>
-                                <p className="text-xs text-slate-500">{bookingData.email}</p>
-                                {bookingData.phone && <p className="text-xs text-slate-500 mt-0.5">{bookingData.phone}</p>}
-                            </div>
-                        </div>
-                    </div>
+                    {/* --- LEFT SIDE: INFO & DETAILS --- */}
+                    <div className="lg:col-span-7 p-8 lg:p-12 flex flex-col justify-between gap-10">
 
-                    <div className="space-y-3 mb-8">
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50/50 border border-violet-100">
-                            <CheckCircle2 className="text-violet-600" size={18} />
-                            <div>
-                                <p className="text-[10px] font-bold text-violet-400 uppercase">Tratamiento</p>
-                                <p className="text-xs font-bold text-violet-900 capitalize">
-                                    {bookingData.type?.replace(/-/g, ' ')}
+                        {/* HEADER SECTION */}
+                        <div>
+                            <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-6 border border-amber-100 shadow-sm">
+                                <Clock size={12} /> Esperando pago
+                            </div>
+                            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-tight mb-4 drop-shadow-sm">
+                                Tu reserva está <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-600">Pendiente</span>.
+                            </h1>
+                            <p className="text-slate-600 font-medium text-pretty leading-relaxed max-w-md">
+                                Tienes <strong className="text-slate-900">15 minutos</strong> para realizar el pago.
+                                El turno se liberará automáticamente si no se confirma.
+                            </p>
+                        </div>
+
+                        {/* INFO GRID */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* BOX 1: Tratamiento */}
+                            <div className="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_2px_15px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <Sparkles size={16} />
+                                    </div>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tratamiento</p>
+                                </div>
+                                <p className="text-base font-bold text-slate-900 capitalize leading-tight">
+                                    {bookingData.type?.replace(/-/g, ' ') || 'Consulta General'}
+                                </p>
+                            </div>
+
+                            {/* BOX 2: Fecha */}
+                            <div className="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_2px_15px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <CalendarCheck size={16} />
+                                    </div>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha</p>
+                                </div>
+                                <p className="text-base font-bold text-slate-900 capitalize leading-tight">
+                                    {displayDate}
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50/50 border border-violet-100">
-                            <CalendarCheck className="text-violet-600" size={18} />
+
+                        {/* USER FOOTER */}
+                        <div className="flex items-center gap-4 pt-2">
+                            <div className="w-10 h-10 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center font-bold text-slate-600 text-sm">
+                                {bookingData.name ? bookingData.name.charAt(0).toUpperCase() : <ShieldCheck size={18} />}
+                            </div>
                             <div>
-                                <p className="text-[10px] font-bold text-violet-400 uppercase">Fecha</p>
-                                <p className="text-xs font-bold text-violet-900">{displayDate}</p>
+                                <p className="text-sm font-bold text-slate-900">{bookingData.name || 'Paciente'}</p>
+                                <p className="text-xs text-slate-400">{bookingData.email || 'Email no disponible'}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-end mb-6">
-                        <div>
-                            <p className="text-sm text-slate-500 font-medium">Total a pagar</p>
-                        </div>
-                        <div className="text-3xl font-black text-slate-900 tracking-tight">
-                            $15.000
-                        </div>
-                    </div>
+                    {/* --- RIGHT SIDE: ACTION AREA --- */}
+                    <div className="lg:col-span-5 bg-slate-50/50 border-t lg:border-t-0 lg:border-l border-slate-200/60 p-8 lg:p-12 flex flex-col justify-center gap-8 relative">
 
-                    <div className="min-h-[50px]">
-                        {isLoading ? (
-                            <div className="w-full py-3 bg-slate-100 rounded-xl flex items-center justify-center gap-2 text-slate-400 animate-pulse">
-                                <Loader2 size={18} className="animate-spin" />
-                                <span className="text-xs font-bold uppercase">Generando link de pago...</span>
+                        {/* TIMER CARD */}
+                        <div className="bg-slate-900 text-white p-6 rounded-[1.5rem] shadow-2xl shadow-slate-900/20 relative overflow-hidden group border border-slate-800">
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+                            <div className="relative z-10 text-center">
+                                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">El turno expira en</p>
+                                <div className="text-5xl font-black tracking-tighter tabular-nums text-white flex justify-center items-center gap-2">
+                                    {formatTime(timeLeft)}
+                                </div>
+                                <div className="mt-4 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: "100%" }}
+                                        animate={{ width: `${(timeLeft / 900) * 100}%` }}
+                                        transition={{ ease: "linear", duration: 1 }}
+                                        className={`h-full ${timeLeft < 180 ? 'bg-red-500' : 'bg-violet-500'}`}
+                                    />
+                                </div>
                             </div>
-                        ) : paymentLink ? (
-                            <button
-                                onClick={handlePayClick}
-                                className="w-full py-4 bg-[#009EE3] hover:bg-[#008ED0] text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                            >
-                                <span>Pagar ahora en Mercado Pago</span>
-                                <ArrowRight size={18} />
-                            </button>
-                        ) : (
-                            <div className="w-full py-3 bg-red-50 text-red-500 rounded-xl flex items-center justify-center text-xs font-bold border border-red-100">
-                                <AlertCircle size={16} className="mr-2" />
-                                Error al generar link. Intenta refrescar.
+                        </div>
+
+                        {/* PRICE & PAY */}
+                        <div className="text-center space-y-6">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total a Pagar</p>
+                                <div className="text-4xl font-black text-slate-900 tracking-tighter drop-shadow-sm">
+                                    $15.000
+                                </div>
                             </div>
-                        )}
+
+                            <div className="relative">
+                                {isLoading ? (
+                                    <button disabled className="w-full py-4 bg-white border border-slate-200 rounded-xl flex items-center justify-center gap-3 text-slate-400 cursor-not-allowed shadow-sm">
+                                        <Loader2 size={20} className="animate-spin text-slate-400" />
+                                        <span className="font-bold text-sm">Procesando...</span>
+                                    </button>
+                                ) : paymentLink ? (
+                                    <a
+                                        href={paymentLink}
+                                        className="block w-full py-4 bg-[#009EE3] hover:bg-[#008ED0] text-white rounded-xl font-bold text-lg shadow-[0_10px_25px_-5px_rgba(0,158,227,0.4)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-center flex items-center justify-center gap-2"
+                                    >
+                                        <span>Pagar con Mercado Pago</span>
+                                        <CreditCard size={20} />
+                                    </a>
+                                ) : (
+                                    <div className="w-full py-4 bg-red-50 text-red-500 rounded-xl flex items-center justify-center text-sm font-bold border border-red-100 gap-2">
+                                        <AlertCircle size={18} />
+                                        <span>Error al cargar link</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-center items-center gap-2 text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+                                <ShieldCheck size={12} className="text-slate-300" />
+                                Pago 100% Seguro
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </motion.div>
