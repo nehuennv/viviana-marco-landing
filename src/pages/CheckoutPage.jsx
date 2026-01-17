@@ -19,7 +19,7 @@ initMercadoPago('APP_USR-314b3d96-b1ff-4ee5-a36d-0c92e28f18d3', {
     locale: 'es-AR'
 });
 
-const API_BOOKING_URL = "https://n8n.vantradigital.com/api/web/booking";
+const API_BOOKING_URL = "/api/web/booking";
 
 const CheckoutPage = () => {
     const [searchParams] = useSearchParams();
