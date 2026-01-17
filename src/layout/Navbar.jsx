@@ -186,26 +186,27 @@ const MobileMenuPortal = ({ isOpen, onClose, links, handleNavClick }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
-          animate={{ opacity: 1, clipPath: "circle(150% at 100% 0%)" }}
-          exit={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          style={{ willChange: 'transform' }}
-          className="fixed inset-0 z-[50] bg-white/95 backdrop-blur-3xl flex flex-col justify-center items-center will-change-[clip-path]"
+          initial={{ y: "-100%" }}
+          animate={{ y: "0%" }}
+          exit={{ y: "-100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="fixed inset-0 z-[50] bg-white/95 backdrop-blur-3xl flex flex-col justify-center items-center rounded-b-[3rem] shadow-2xl shadow-purple-900/10 overflow-hidden"
         >
           {/* Fondo estático en móvil para evitar lag */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-purple-200/30 rounded-full blur-[80px] pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200/20 rounded-full blur-[80px] pointer-events-none"></div>
 
           <div className="flex flex-col items-center gap-8 w-full max-w-sm px-6 relative z-10">
-            {links.map((link, idx) => (
+            {links.map((link) => (
               <motion.a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 + (idx * 0.1), duration: 0.5, ease: "easeOut" }}
+                variants={{
+                  open: { y: 0, opacity: 1 },
+                  closed: { y: 20, opacity: 0 }
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 className="text-4xl font-bold text-slate-800 tracking-tight"
               >
                 {link.name}
@@ -213,17 +214,20 @@ const MobileMenuPortal = ({ isOpen, onClose, links, handleNavClick }) => {
             ))}
 
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "100px" }}
-              className="h-[1px] bg-slate-200 my-2"
+              variants={{
+                open: { scaleX: 1, opacity: 1 },
+                closed: { scaleX: 0, opacity: 0 }
+              }}
+              className="h-[1px] bg-slate-200 my-2 w-[100px]"
             />
 
             <motion.a
               href="#booking"
               onClick={(e) => handleNavClick(e, '#booking')}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              variants={{
+                open: { y: 0, opacity: 1, scale: 1 },
+                closed: { y: 20, opacity: 0, scale: 0.95 }
+              }}
               className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-violet-600 text-white shadow-xl shadow-violet-600/20 active:scale-[0.98] transition-all duration-300"
             >
               <div>

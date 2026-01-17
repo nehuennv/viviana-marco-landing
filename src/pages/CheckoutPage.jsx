@@ -180,27 +180,53 @@ const CheckoutPage = () => {
         }
     };
 
-    // --- EARLY RETURN: SIN UID ---
+    // --- EARLY RETURN: SIN UID (PREMIUM BRAND DESIGN) ---
     if (!initialBookingData.uid) {
         return (
-            <div className="min-h-screen bg-slate-50 relative font-sans flex items-center justify-center p-4 lg:p-8 overflow-hidden">
+            <div className="min-h-screen bg-slate-50 relative font-sans flex items-center justify-center p-4 overflow-hidden">
+                {/* --- FONDO DISRUPTIVO (Strict Brand Purple) --- */}
                 <div className="fixed inset-0 z-0 pointer-events-none">
                     <div className="absolute top-[-20%] left-[-10%] w-[90vw] h-[90vw] bg-violet-300/30 rounded-full blur-[120px] mix-blend-multiply" />
                     <div className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] bg-purple-200/40 rounded-full blur-[100px] mix-blend-multiply" />
                 </div>
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="relative z-10 bg-white/60 backdrop-blur-3xl border border-white/80 rounded-[2rem] shadow-xl p-8 max-w-md w-full text-center space-y-6"
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative z-10 w-full max-w-md"
                 >
-                    <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlertCircle size={32} />
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-black text-slate-900 mb-2">Link Incompleto o Inválido</h2>
-                        <p className="text-slate-600">No se encontró la información necesaria para procesar la reserva.</p>
-                        <p className="text-slate-500 text-sm mt-2">Por favor, asegúrate de usar el link completo enviado a tu correo o intenta reservar nuevamente.</p>
+                    <div className="relative bg-white/60 backdrop-blur-3xl border border-white/80 rounded-[2.5rem] shadow-[0_40px_100px_-10px_rgba(0,0,0,0.1)] p-10 text-center overflow-hidden ring-1 ring-white/50">
+                        {/* Decorative Background Blur inside Card */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-violet-400/20 rounded-full blur-[60px] pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col items-center gap-6">
+                            {/* Icon Container */}
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-violet-200 rounded-full blur-xl opacity-50 animate-pulse" />
+                                <div className="w-20 h-20 bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-[0_10px_30px_-5px_rgba(124,58,237,0.15)] border border-white flex items-center justify-center relative z-10 transform rotate-3">
+                                    <ShieldCheck size={32} className="text-violet-500 drop-shadow-sm" />
+                                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md border border-slate-50">
+                                        <span className="text-lg">🔒</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                                    Enlace No Disponible
+                                </h2>
+                                <p className="text-slate-500 font-medium text-pretty leading-relaxed">
+                                    Por motivos de seguridad y privacidad, el acceso a la reserva requiere un enlace válido.
+                                </p>
+                            </div>
+
+                            <div className="w-full pt-2">
+                                <div className="p-4 rounded-xl bg-violet-50/50 border border-violet-100 text-xs font-medium text-violet-700 leading-snug">
+                                    Si creés que esto es un error, por favor solicitá un nuevo link de pago.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
             </div>
