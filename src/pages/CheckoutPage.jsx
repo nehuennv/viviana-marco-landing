@@ -171,6 +171,33 @@ const CheckoutPage = () => {
         }
     };
 
+    // --- EARLY RETURN: SIN UID ---
+    if (!initialBookingData.uid) {
+        return (
+            <div className="min-h-screen bg-slate-50 relative font-sans flex items-center justify-center p-4 lg:p-8 overflow-hidden">
+                <div className="fixed inset-0 z-0 pointer-events-none">
+                    <div className="absolute top-[-20%] left-[-10%] w-[90vw] h-[90vw] bg-violet-300/30 rounded-full blur-[120px] mix-blend-multiply" />
+                    <div className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] bg-purple-200/40 rounded-full blur-[100px] mix-blend-multiply" />
+                </div>
+
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative z-10 bg-white/60 backdrop-blur-3xl border border-white/80 rounded-[2rem] shadow-xl p-8 max-w-md w-full text-center space-y-6"
+                >
+                    <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle size={32} />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-900 mb-2">Link Incompleto o Inválido</h2>
+                        <p className="text-slate-600">No se encontró la información necesaria para procesar la reserva.</p>
+                        <p className="text-slate-500 text-sm mt-2">Por favor, asegúrate de usar el link completo enviado a tu correo o intenta reservar nuevamente.</p>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-slate-50 relative font-sans flex items-center justify-center p-4 lg:p-8 overflow-hidden">
             {/* --- FONDO DISRUPTIVO (Strict Brand Purple) --- */}
