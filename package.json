@@ -13,6 +13,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@mercadopago/sdk-react": "^1.0.7",
     "aos": "^2.3.4",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",

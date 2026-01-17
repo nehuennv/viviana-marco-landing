@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; // IMPORTANTE
+import { BrowserRouter } from 'react-router-dom'; // IMPORTANTE
 import App from './App.jsx'
-import BookingPage from './pages/BookingPage.jsx';
 import './index.css'
 
 // --- IMPORTAR AOS (ANIMACIONES) ---
@@ -37,13 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* 👇 ESTA ES LA LÍNEA MÁGICA QUE ARREGLA GITHUB PAGES 👇 */}
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <Routes>
-        {/* RUTA 1: La Landing Page Principal */}
-        <Route path="/" element={<App />} />
-
-        {/* RUTA 2: La Página Limpia de Turnos */}
-        <Route path="/turnos" element={<BookingPage />} />
-      </Routes>
+      <App />
     </BrowserRouter>
   </React.StrictMode>,
 )
