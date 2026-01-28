@@ -20,6 +20,8 @@ const Reviews = React.lazy(() => import('./sections/Reviews'));
 // --- PÁGINAS NUEVAS ---
 // IMPORTANTE: Verifica que la ruta coincida con donde creaste el archivo
 const CheckoutPage = React.lazy(() => import('./pages/CheckoutPage'));
+const CheckoutSuccess = React.lazy(() => import('./pages/CheckoutSuccess'));
+const CheckoutFailure = React.lazy(() => import('./pages/CheckoutFailure'));
 const BookingPage = React.lazy(() => import('./pages/BookingPage'));
 
 // --- EFECTOS VISUALES ---
@@ -133,10 +135,16 @@ function App() {
     <div className="relative min-h-screen font-sans selection:bg-purple-500/30 selection:text-purple-900">
 
       {/* SELECCIÓN DE SPLASH SCREEN SEGÚN RUTA */}
-      {location.pathname.startsWith('/checkout') ? (
+      {location.pathname.startsWith('/checkout') && !location.pathname.includes('/success') && !location.pathname.includes('/failure') ? (
         <CheckoutLoader isLoading={isLoading} />
       ) : (
-        <SplashScreen isLoading={isLoading} />
+        // Para Home y otras rutas, usamos el Splash normal SOLO si es Home o si se refresca la app
+        // Pero en este caso, si estamos en success/failure, NO queremos splash ni loader
+        // Entonces, si es success/failure, isLoading visualmente no debe bloquear nada.
+        // PERO: Si isLoading es true, el contenido debajo podría no estar listo si depende de isLoading.
+        // En App.jsx, LandingPage usa isLoading. Las rutas checkout success/failure NO reciben prop isLoading.
+        // Así que simplemente no mostramos NINGÚN loader overlay para success/failure.
+        !location.pathname.includes('/checkout') && <SplashScreen isLoading={isLoading} />
       )}
 
       <BackgroundFlow />
@@ -155,6 +163,8 @@ function App() {
           } />
 
           {/* RUTA 2: Checkout (Catch-all) */}
+          <Route path="/checkout/success" element={<CheckoutSuccess />} />
+          <Route path="/checkout/failure" element={<CheckoutFailure />} />
           <Route path="/checkout/*" element={<CheckoutPage />} />
 
           {/* RUTA 3: Booking Pages (Alias) */}

@@ -41,7 +41,7 @@ const CheckoutLoader = ({ isLoading }) => {
                                 transition={{ delay: 0.2, duration: 0.8 }}
                                 className="text-lg md:text-2xl font-bold tracking-tight text-slate-800"
                             >
-                                Preparando tu reserva...
+                                Preparando tu turno...
                             </motion.h2>
 
                             <motion.p

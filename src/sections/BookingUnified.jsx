@@ -7,7 +7,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBaserow } from '../hooks/useBaserow';
 
-const CAL_BASE_URL = "https://cal.com/dra-viviana-marco-demo";
+const CAL_BASE_URL = "https://cal.com/dravivianamarco";
 
 // --- UTILIDADES ---
 const normalizeText = (text) => text.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();

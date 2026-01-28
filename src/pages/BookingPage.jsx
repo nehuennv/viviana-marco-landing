@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 // --- CONFIGURACIÓN ---
-const CAL_BASE_URL = "https://cal.com/dra-viviana-marco-demo";
+const CAL_BASE_URL = "https://cal.com/dravivianamarco";
 
 // --- COMPONENTES VISUALES ---
 
