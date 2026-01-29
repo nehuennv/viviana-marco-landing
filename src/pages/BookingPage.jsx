@@ -122,7 +122,7 @@ const OPTIONS = [
         slug: 'primera-consulta-odontologica',
         category: 'Salud Dental',
         title: 'Primera Consulta Odontológica',
-        description: 'Diagnóstico bucal completo y presupuesto. Planificación digital para Ortodoncia Invisible, Implantes y Diseño de Sonrisa.',
+        description: 'Diagnóstico bucal completo y presupuesto. Planificación digital para Ortodoncia Invisible y Diseño de Sonrisa.',
         icon: Smile,
         tags: [
             { label: 'Scanner 3D', icon: Zap },
