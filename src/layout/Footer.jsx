@@ -111,7 +111,7 @@ const Footer = () => {
                   <Phone size={18} className="text-slate-400 flex-shrink-0" /> +54 9 299 597-7208
                 </a>
                 <a href="https://wa.me/5492994667386" target="_blank" className="flex items-center gap-3 text-lg hover:text-primary transition-colors">
-                  <Phone size={18} className="text-slate-400 flex-shrink-0" />  +54 9 299 466-7386 
+                  <Phone size={18} className="text-slate-400 flex-shrink-0" />  +54 9 299 466-7386
                 </a>
               </div>
             </div>
@@ -139,7 +139,7 @@ const Footer = () => {
               </div>
               <h3 className="text-2xl font-bold mb-1">Neuquén Capital</h3>
               <p className="text-slate-300 mb-4">Fotheringham 115</p>
-              <a href="https://maps.app.goo.gl/TU_LINK_GOOGLE_MAPS" target="_blank" rel="noopener noreferrer" className="btn btn-sm bg-white/10 border-none text-white hover:bg-white hover:text-indigo-950 rounded-full px-6 backdrop-blur-md">
+              <a href="https://maps.app.goo.gl/dp7V7mwFMEKhdbRS8" target="_blank" rel="noopener noreferrer" className="btn btn-sm bg-white/10 border-none text-white hover:bg-white hover:text-indigo-950 rounded-full px-6 backdrop-blur-md">
                 Abrir Mapa
               </a>
             </div>

@@ -88,7 +88,7 @@ const CheckoutSuccess = () => {
                                 ¡Pago Exitoso!
                             </h1>
                             <p className="text-sm md:text-base text-slate-600 font-medium text-pretty leading-relaxed px-2">
-                                Tu turno ha sido confirmado correctamente. Te enviamos un correo electrónico con todos los detalles.
+                                Tu turno ha sido confirmado correctamente. Te enviamos un mensaje de WhatsApp con la confirmación de tu turno.
                             </p>
                         </div>
 
@@ -119,8 +119,8 @@ const CheckoutSuccess = () => {
                                     <Mail size={16} />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-[10px] uppercase font-bold text-slate-400">Revisá tu correo</p>
-                                    <p className="text-sm font-bold text-slate-600">Enviamos el comprobante</p>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400">Revisá tu WhatsApp</p>
+                                    <p className="text-sm font-bold text-slate-600">Confirmación enviada</p>
                                 </div>
                             </div>
                         </div>

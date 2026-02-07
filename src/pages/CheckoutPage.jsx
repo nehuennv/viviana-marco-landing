@@ -326,7 +326,7 @@ const CheckoutPage = () => {
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-slate-900">{displayData.name || 'Paciente'}</p>
-                                <p className="text-xs text-slate-400">{displayData.email || 'Email no disponible'}</p>
+                                <p className="text-xs text-slate-400">{displayData.phone || 'Teléfono no disponible'}</p>
                             </div>
                         </div>
                     </div>
@@ -360,7 +360,7 @@ const CheckoutPage = () => {
                             <div>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total a Pagar</p>
                                 <div className={`text-4xl font-black text-slate-900 tracking-tighter drop-shadow-sm ${status === 'paid' ? 'text-green-600' : ''}`}>
-                                    $15.000
+                                    $40.0000
                                 </div>
                             </div>
 
