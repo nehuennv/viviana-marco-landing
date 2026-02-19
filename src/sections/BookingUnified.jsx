@@ -73,7 +73,7 @@ const BookingUnified = ({ initialTreatment }) => {
       // Palabras clave para Odontología
       const dentalKeywords = ['ortodoncia', 'diente', 'bracket', 'alineador', 'dental', 'blanqueamiento', 'conducto', 'muela', 'general', 'placa', 'ronquido', 'bruxismo'];
       if (dentalKeywords.some(k => lower.includes(k))) {
-        mappedTreatment = "Primera Consulta Odontológica";
+        mappedTreatment = "Primera Consulta Ortodoncia";
       }
 
       setFormData(prev => ({ ...prev, tratamiento: mappedTreatment }));
@@ -124,7 +124,7 @@ const BookingUnified = ({ initialTreatment }) => {
     {
       id: 'odontologia',
       slug: 'primera-consulta-odontologica',
-      title: 'Primera Consulta Odontológica',
+      title: 'Primera Consulta Ortodoncia',
       subtitle: 'Diagnóstico bucal completo y presupuesto.',
       icon: <Smile size={24} className="text-cyan-600" />,
       theme: {
@@ -202,7 +202,7 @@ const BookingUnified = ({ initialTreatment }) => {
                         <select name="tratamiento" value={formData.tratamiento} onChange={handleFormChange} className="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-base font-medium text-slate-700 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 transition-all shadow-sm appearance-none cursor-pointer">
                           <option value="" disabled>Seleccioná el motivo de consulta...</option>
                           <option value="Primera Consulta Estética">Primera Consulta Estética</option>
-                          <option value="Primera Consulta Odontológica">Primera Consulta Odontológica</option>
+                          <option value="Primera Consulta Ortodoncia">Primera Consulta Ortodoncia</option>
                         </select>
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg></div>
                       </div>
